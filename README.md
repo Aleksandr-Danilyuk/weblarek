@@ -139,17 +139,17 @@ Presenter - презентер содержит основную логику п
 `constructor(allProduct: IProduct[])` - принимает массив всех товаров доступных для покупки.
 
 Поля класса:
-`_allProduct: IProduct[]` - хранит массив всех товаров;
-`_selectedProduct!: string;` - хранит товар, выбранный для подробного отображения; В качестве значения принимается id товара
+`allProduct!: IProduct[]` - хранит массив всех товаров;
+`selectedProduct!: IProduct;` - хранит товар, выбранный для подробного отображения;
 
 Методы класса:  
-`set allProduct(Api: IApi): void` - сохранение массива товаров полученного в параметрах метода;
+`set allProduct(arrayProduct: IProduct[])` - сохранение массива товаров полученного в параметрах метода;
 `get allProduct(): IProduct[]`  - получение массива товаров из модели;
 
-`set selectedProduct(product: string): void` - сохранение товара для подробного отображения;
-`get selectedProduct(): string`  - получение товара для подробного отображения.
+`set selectedProduct(product: IProduct)` - сохранение товара для подробного отображения;
+`get selectedProduct(): IProduct`  - получение товара для подробного отображения.
 
-`getProduct(selectedProduct: string): IProduct` - получение одного товара по его id;
+`getProduct(idProduct: string): IProduct | undefined` - получение одного товара по его id;
 
 
 #### Класс Buyer
@@ -159,46 +159,46 @@ Presenter - презентер содержит основную логику п
 `constructor(payment: TPayment, address: string, email: string, , phone: string)` - В конструктор передаются данные покупателя и заказа
 
 Поля класса:
-`_payment: TPayment`   - поле содержит выбранный покупателем способ оплаты заказа. 
-`_address: string` - поле хранит адрес доставки товара.
-`_email: string` - поле для хранения электронного адреса покупателя. 
-`_phone: string` - поле для хранения телефонного номера покупателя. 
+`payment: TPayment`   - поле содержит выбранный покупателем способ оплаты заказа. 
+`address: string` - поле хранит адрес доставки товара.
+`email: string` - поле для хранения электронного адреса покупателя. 
+`phone: string` - поле для хранения телефонного номера покупателя. 
 
 Методы класса:  
-`set payment(valuePayment: TPayment): void` - сохраняет выбранный покупателем способ оплаты заказа.
+`set payment(valuePayment: TPayment)` - сохраняет выбранный покупателем способ оплаты заказа.
 `get payment(): TPayment`  - получает выбранный покупателем способ оплаты заказа.
 
-`set address(valueAddress: string): void` - сохраняет адрес доставки товара.
+`set address(valueAddress: string)` - сохраняет адрес доставки товара.
 `get address(): string`  - получает адрес доставки товара.
 
-`set email(valueEmail: string): void` - сохраняет электронный адрес покупателя.
+`set email(valueEmail: string)` - сохраняет электронный адрес покупателя.
 `get email(): string`  - получает электронный адрес покупателя.
 
-`set phone(valuePhone: string): void` - сохраняет выбранный покупателем способ оплаты заказа.
+`set phone(valuePhone: string)` - сохраняет выбранный покупателем способ оплаты заказа.
 `get phone(): string`  - получает выбранный покупателем способ оплаты заказа.
 
 `getDataBuyer(): IBuyer` - метод реализующий получение всех данных покупателя.
 `clearDataBuyer(): IBuyer` - метод реализующий очистку данных покупателя.
 
-`validPayment(payment: TPayment): string` - метод реализующий валидацию способа оплаты заказа.
-`validAddress(address: string): string` - метод реализующий валидацию адреса доставки товара.
-`validEmail(email: string): string` - метод реализующий электронного адреса покупателя.
-`validPhone(phone: string): string` - метод реализующий телефонного номера покупателя.
+`validPayment(): string` - метод реализующий валидацию способа оплаты заказа.
+`validAddress(): string` - метод реализующий валидацию адреса доставки товара.
+`validEmail(): string` - метод реализующий электронного адреса покупателя.
+`validPhone(): string` - метод реализующий телефонного номера покупателя.
 
 #### Класс BoxWithBuy
 Класс реализует хранение товаров, которые пользователь выбрал для покупки;
 
 Конструктор класса не принимает параметров. Так как изначально корзина пустая.
 
-# Поля класса:  поле для хранения корневого DOM элемента компонента.
-`_selectedProduct!: IProduct[]` - поле хранит массив товаров, выбранных покупателем для покупки.
+Поля класса:
+`selectedProduct!: IProduct[]` - поле хранит массив товаров, выбранных покупателем для покупки.
 
-# Методы класса:  
-`set addProduct(id: string): void` - добавление товара, который был получен в параметре, в массив корзины.
-`set deleteProduct(id: string): void` - удаление товара, полученного в параметре из массива корзины.
+Методы класса:  
+`addProduct(product: IProduct)` - добавление товара, который был получен в параметре, в массив корзины.
+`deleteProduct(product: IProduct)` - удаление товара, полученного в параметре из массива корзины.
 `get selectedProduct(): IProduct[]`  - получение массива товаров, которые находятся в корзине.
-`set cleanSelectedProduct(): void` - очистка корзины.
-`get costSelectedProduct(): number`  - получение стоимости всех товаров в корзине;
-`get numberSelectedProduct(): number`  - получение количества товаров в корзине;
-`get checkProduct(id: string): Boolean`  - проверка наличия товара в корзине по его id, полученного в параметр метода.
+`cleanSelectedProduct()` - очистка корзины.
+`costSelectedProduct(): number`  - получение стоимости всех товаров в корзине;
+`numberSelectedProduct(): number`  - получение количества товаров в корзине;
+`checkProduct(id: string): Boolean`  - проверка наличия товара в корзине по его id, полученного в параметр метода.
 
