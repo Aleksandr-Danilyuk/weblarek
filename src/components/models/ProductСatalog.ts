@@ -12,10 +12,13 @@ export class ProductСatalog {
     protected _allProduct!: IProduct[];     // хранит массив всех товаров;
     protected _selectedProduct!: IProduct;  // хранит товар, выбранный для подробного отображения;
 
-    constructor(allProduct: IProduct[]) {
+   /* constructor(allProduct: IProduct[]) {
         this.allProduct = allProduct;
     }
-
+    */
+    constructor() {
+        this.allProduct;
+    }
     // Методы класса:   
     // сохранение массива товаров полученного в параметрах метода;
     public set allProduct (arrayProduct: IProduct[]) {

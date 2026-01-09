@@ -13,7 +13,9 @@ export class BoxWithBuy {
     protected _selectedProduct!: IProduct[] ; // поле хранит массив товаров, выбранных покупателем для покупки 
 
     // Конструктор класса не принимает параметров. Так как изначально корзина пустая.
-    constructor() {}
+    constructor() {
+        let _selectedProduct = new Array<IProduct>();
+    }
 
     // Методы класса:   
     // добавление товара, который был получен в параметре, в массив корзины

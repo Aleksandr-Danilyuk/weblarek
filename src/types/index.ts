@@ -22,3 +22,5 @@ export interface IBuyer {
   phone: string;
   address: string;
 }
+
+// тип для объекта, отправляемого на сервер при оформлении заказа.

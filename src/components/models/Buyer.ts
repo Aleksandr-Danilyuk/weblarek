@@ -14,11 +14,17 @@ export class Buyer implements IBuyer {
     protected _email!: string; // поле для хранения электронного адреса покупателя. 
     protected _phone!: string; // поле для хранения телефонного номера покупателя. 
 
-    constructor(payment: TPayment, address: string, email: string, phone: string) {
+    /*
+    //constructor(payment: TPayment, address: string, email: string, phone: string) {
+    constructor(payment?: TPayment, address?: string, email?: string, phone?: string) {
         this.payment = payment;
         this.address = address;
         this.email = email;
         this.phone = phone;
+    }
+    */
+    constructor() {
+        this.clearDataBuyer();
     }
 
     // Методы класса:   
