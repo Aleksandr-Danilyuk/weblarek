@@ -24,8 +24,6 @@ console.log(`Товары выбранные покупателоем (если 
 
 const pingCommunicationLayer = new Api(API_URL); //Создание экземпляра CommunicationLayer
 const pongCommunicationLayer  = new CommunicationLayer(pingCommunicationLayer); // Создание экземпляра CommunicationLayer
-//const productFromCommunicationLayer  = await pongCommunicationLayer.getProduct();
-//console.log(`Получаем список товаров с сервера методом Get ${productFromCommunicationLayer}`)
 
 pongCommunicationLayer.getProduct().then(product => {
     console.log(`Получаем список товаров с сервера методом Get ${product}`);
