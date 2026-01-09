@@ -24,3 +24,9 @@ export interface IBuyer {
 }
 
 // тип для объекта, отправляемого на сервер при оформлении заказа.
+export interface IBuyer {
+  payment: TPayment;
+  email: string;
+  phone: string;
+  address: string;
+}
