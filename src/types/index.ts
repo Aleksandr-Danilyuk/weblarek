@@ -23,10 +23,7 @@ export interface IBuyer {
   address: string;
 }
 
-// тип для объекта, отправляемого на сервер при оформлении заказа.
-export interface IBuyer {
-  payment: TPayment;
-  email: string;
-  phone: string;
-  address: string;
+export interface IProductsBuyer {
+  Buyer: IBuyer;
+  products:IProduct[];
 }

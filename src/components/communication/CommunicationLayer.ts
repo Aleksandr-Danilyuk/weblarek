@@ -1,5 +1,4 @@
-import { IApi } from "../../types";
-import { IProduct } from "../../types";
+import { IApi, IProduct, IProductsBuyer } from "../../types";
 
 export class CommunicationLayer {
     protected CommunicationApi: IApi;
@@ -12,7 +11,7 @@ export class CommunicationLayer {
         return this.CommunicationApi.get('/product/');
     }
 
-    async postBuy(data: object) {
+    async postBuy(data: IProductsBuyer) {
         return this.CommunicationApi.post("/order/", data);
     }
 }
