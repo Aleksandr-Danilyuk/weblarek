@@ -1,24 +1,14 @@
-interface IProduct {
-  id: string;
-  description: string;
-  image: string;
-  title: string;
-  category: string;
-  price: number | null;
-}
+import {IProduct} from "../../types";
 
-export class ProductСatalog {
+export class ProductsСatalog {
     // Поля класса : 
-    protected _allProduct!: IProduct[];     // хранит массив всех товаров;
-    protected _selectedProduct!: IProduct;  // хранит товар, выбранный для подробного отображения;
+    private _allProduct!: IProduct[];     // хранит массив всех товаров;
+    private _selectedProduct: IProduct | null = null;  // хранит товар, выбранный для подробного отображения, изначально товар не выбран;
 
-   /* constructor(allProduct: IProduct[]) {
-        this.allProduct = allProduct;
-    }
-    */
     constructor() {
-        this.allProduct;
+        this.allProduct = [];
     }
+    
     // Методы класса:   
     // сохранение массива товаров полученного в параметрах метода;
     public set allProduct (arrayProduct: IProduct[]) {
@@ -36,18 +26,12 @@ export class ProductСatalog {
     }
 
     // получение товара для подробного отображения
-    get selectedProduct(): IProduct {
+    get selectedProduct(): IProduct | null {
         return this._selectedProduct;
     }
 
     // получение одного товара по его id;
     getProduct(idProduct: string): IProduct | undefined { 
-        const foundProduct = this.allProduct.find(product => product.id === idProduct);
-        if (foundProduct) {
-            return foundProduct;
-        } else {
-            return undefined;
-        }
-        
+        return this.allProduct.find(product => product.id === idProduct);
     }
 }

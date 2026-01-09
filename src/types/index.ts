@@ -18,12 +18,17 @@ export interface IProduct {
 
 export interface IBuyer {
   payment: TPayment;
+  address: string;
   email: string;
   phone: string;
-  address: string;
 }
 
-export interface IProductsBuyer {
-  Buyer: IBuyer;
-  products:IProduct[];
+export interface IOrderRequest extends IBuyer {
+   items: IProduct[];
+   total: number;
+}
+
+export interface IBuyRequest extends IBuyer {
+   id: string;
+   total: number;
 }

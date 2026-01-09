@@ -1,30 +1,19 @@
-type TPayment = 'card' | 'cash' | '';
+import {IBuyer} from "../../types";
 
-interface IBuyer {
-  payment: TPayment;
-  email: string;
-  phone: string;
-  address: string;
-}
+type TPayment = 'card' | 'cash' | '';
 
 export class Buyer implements IBuyer {
     // Поля класса : 
-    protected _payment!: TPayment; // поле содержит выбранный покупателем способ оплаты заказа. 
-    protected _address!: string; // поле хранит адрес доставки товара.
-    protected _email!: string; // поле для хранения электронного адреса покупателя. 
-    protected _phone!: string; // поле для хранения телефонного номера покупателя. 
+    private _payment: TPayment; // поле содержит выбранный покупателем способ оплаты заказа. 
+    private _address: string; // поле хранит адрес доставки товара.
+    private _email: string; // поле для хранения электронного адреса покупателя. 
+    private _phone: string; // поле для хранения телефонного номера покупателя. 
 
-    /*
-    //constructor(payment: TPayment, address: string, email: string, phone: string) {
-    constructor(payment?: TPayment, address?: string, email?: string, phone?: string) {
-        this.payment = payment;
-        this.address = address;
-        this.email = email;
-        this.phone = phone;
-    }
-    */
     constructor() {
-        this.clearDataBuyer();
+        this._payment = '';
+        this._address = '';
+        this._email = '';
+        this._phone = '';
     }
 
     // Методы класса:   
@@ -79,48 +68,31 @@ export class Buyer implements IBuyer {
     }
 
     // метод реализующий очистку данных покупателя
-    clearDataBuyer(): IBuyer {
-        return {
-            payment : '',
-            address : '',
-            email : '',
-            phone : ''
-        }
+    clearDataBuyer() {
+        this.payment = '';
+        this.address = '';
+        this.email = '';
+        this.phone = '';
+    
     }
 
     // метод реализующий валидацию способа оплаты заказа
     validPayment(): string {
-        if (this.payment === '') {
-            return 'Способ оплаты не выбран'
-        } else {
-            return '';
-        } 
+        return this.payment === '' ? 'Способ оплаты не выбран' : '';
     }
 
     // метод реализующий валидацию адреса доставки товара
     validAddress(): string {
-        if (this.address === '') {
-            return 'Адрес доставки не задан'
-        } else {
-            return '';
-        } 
+        return this.address === '' ? 'Адрес доставки не задан' : '';
     }
 
     // метод реализующий электронного адреса покупателя
     validEmail(): string {
-        if (this.email === '') {
-            return 'Укажите емэйл'
-        } else {
-            return '';
-        } 
+        return this.email === '' ? 'Укажите емэйл' : '';
     }
 
     // метод реализующий телефонного номера покупателя
     validPhone(): string {
-        if (this.phone === '') {
-            return 'Укажите номер телефона'
-        } else {
-            return '';
-        } 
+        return this.email === '' ? 'Укажите номер телефона' : '';
     }
 }
