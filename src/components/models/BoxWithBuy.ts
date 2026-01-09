@@ -14,7 +14,7 @@ export class BoxWithBuy {
 
     // Конструктор класса не принимает параметров. Так как изначально корзина пустая.
     constructor() {
-        let _selectedProduct = new Array<IProduct>();
+        this._selectedProduct = new Array<IProduct>();
     }
 
     // Методы класса:   

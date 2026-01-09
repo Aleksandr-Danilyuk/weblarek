@@ -22,7 +22,14 @@ console.log(buyerModel.payment);
 const boxWithBuyModel = new BoxWithBuy(); // Создание экземпляра BoxWithBuy
 console.log(`Товары выбранные покупателоем (если не выбраны то undefined): ${boxWithBuyModel.selectedProduct}`);
 
-const pingCommunicationLayer = new Api(API_URL); // =https://larek-api.nomoreparties.co); Создание экземпляра CommunicationLayer
+const pingCommunicationLayer = new Api(API_URL); //Создание экземпляра CommunicationLayer
 const pongCommunicationLayer  = new CommunicationLayer(pingCommunicationLayer); // Создание экземпляра CommunicationLayer
-const productFromCommunicationLayer  = pongCommunicationLayer.getProduct;
-console.log(`Получаем список товаров с сервера методом Get " ${productFromCommunicationLayer}`)
+//const productFromCommunicationLayer  = await pongCommunicationLayer.getProduct();
+//console.log(`Получаем список товаров с сервера методом Get ${productFromCommunicationLayer}`)
+
+pongCommunicationLayer.getProduct().then(product => {
+    console.log(`Получаем список товаров с сервера методом Get ${product}`);
+}).catch(error => {
+    console.log(`Ошибка получения списока товаров с сервера методом Get ${error}`);
+});
+
