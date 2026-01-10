@@ -1,4 +1,4 @@
-import { IApi, IProduct, IBuyRequest, IOrderRequest } from "../../types";
+import { IApi, IProductsResponse, IOrderRequest, IOrderResponse } from "../../types";
 
 export class CommunicationLayer {
     protected communicationApi: IApi;
@@ -7,11 +7,11 @@ export class CommunicationLayer {
         this.communicationApi = Api;
     }
 
-    async getProduct():  Promise<IOrderRequest> {
-        return this.communicationApi.get<IOrderRequest>('/product/');
+    async getProduct():  Promise<IProductsResponse> {
+        return this.communicationApi.get<IProductsResponse>('/product/');
     }
 
-    async postBuy(data: IProduct):  Promise<IBuyRequest> {
-        return this.communicationApi.post<IBuyRequest>("/order/", data, 'POST');
+    async postBuy(data: IOrderRequest):  Promise<IOrderResponse> {
+        return this.communicationApi.post<IOrderResponse>("/order/", data, 'POST');
     }
 }
