@@ -13,6 +13,8 @@ import {API_URL} from './utils/constants';
 
 // 9 спринт import Header
 import {Header} from './components/view/Header';
+import { CardCatalog } from './components/view/Card/CardCatalog';
+import { cloneTemplate } from './utils/utils';
 
 
 // Создание экземпляра ProductsСatalog
@@ -91,10 +93,47 @@ const gallery = document.querySelector('.gallery') as HTMLElement;
 
 const events = new EventEmitter;
 
-// Проверка View компонента headerView      +
+// Проверка компонента headerView слоя View      +
 const HeaderHTML = document.querySelector('.header') as HTMLElement;
 const headerView = new Header(events, HeaderHTML);
 
+
 events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
 		console.log("Сработало событие нажатие копки корзины")
+        headerView.counter = 1;     // Render срабатывает автоматически
+        headerView.render({counter:2}); // Перпедаём в Render обьект для отрисовки
 	});  
+
+// =================
+// Модель данных наполнение
+console.log('Передаём данные с севреар в модель данных');
+pongCommunicationLayer.getProduct().then(product => {
+    productsModel.allProduct = [];
+    console.log(productsModel.allProduct); 
+    console.log('Модель данных наполнение, Получаем список товаров с сервера методом Get ', product);
+    productsModel.allProduct = product.items;
+    console.log('Поиск по ID товара из каталога: ', productsModel.getProduct("b06cde61-912f-4663-9751-09956c0eed67")); 
+});
+
+events.on( 'basket:open', () => {  // 'catalog:changed'
+    const itemCards = productsModel.allProduct.map((item) => {
+        console.log(item);
+        const CardCatalogTemplate = document.getElementById('card-catalog');
+        console.log(CardCatalogTemplate);
+
+        if (CardCatalogTemplate) {
+            const card = new CardCatalog(cloneTemplate(CardCatalogTemplate), {
+                onClick: () => events.emit('card:select', item),
+            });
+            return card.render(item);
+        } else {
+            // Обработка случая, когда шаблон не найден
+            console.error('Template not found');
+            return null; // или другой подходящий объект
+        }
+    });
+
+    gallery.replaceChild({ catalog: itemCards.filter(card => card !== null) });
+});  
+
+// Проверка компонента CardCatalog слоя View      

@@ -3,7 +3,7 @@ import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
 //import {GalleryData} from "../../types";
 
-// работа с инпут
+// Шаблон для работы с инпут
 //const inputElement = document.getElementById('inputId') as HTMLInputElement;
 //const value = inputElement.value;
 //console.log(value);
