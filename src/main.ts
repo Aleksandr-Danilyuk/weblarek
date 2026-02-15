@@ -5,10 +5,15 @@ import {Buyer} from './components/models/Buyer';
 import {BoxWithBuy} from './components/models/BoxWithBuy';
 import {CommunicationLayer} from './components/communication/CommunicationLayer';
 import {Api} from './components/base/Api';
+import {EventEmitter} from './components/base/Events';
 
 import {apiProducts} from './utils/data';
 
 import {API_URL} from './utils/constants';
+
+// 9 спринт import Header
+import {Header} from './components/view/Header';
+
 
 // Создание экземпляра ProductsСatalog
 const productsModel = new ProductsСatalog(); 
@@ -28,8 +33,6 @@ const testProduct = {
 productsModel.selectedProduct = testProduct;
 console.log('Выбранный товар из каталога: ', productsModel.selectedProduct); 
 console.log('Поиск по ID товара из каталога: ', productsModel.getProduct("b06cde61-912f-4663-9751-09956c0eed67")); 
-
-
 
 
 // Создание экземпляра Buyer
@@ -80,3 +83,18 @@ pongCommunicationLayer.getProduct().then(product => {
     console.log('Ошибка получения списока товаров с сервера методом Get ', error);
 });
 
+
+// 9 спринт 
+// Для отображения компонентов можно использовать элемент <main class="gallery"></main>
+const gallery = document.querySelector('.gallery') as HTMLElement;
+//  Для проверки работы компонента можете использовать метод gallery.replaceChildren(component.render())
+
+const events = new EventEmitter;
+
+// Проверка View компонента headerView      +
+const HeaderHTML = document.querySelector('.header') as HTMLElement;
+const headerView = new Header(events, HeaderHTML);
+
+events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
+		console.log("Сработало событие нажатие копки корзины")
+	});  
