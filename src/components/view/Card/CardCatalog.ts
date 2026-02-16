@@ -1,7 +1,8 @@
 import {Card} from './Card';
 import {ensureElement} from '../../../utils/utils';
-// import { IProduct } from '../../../types';
+import { IProduct } from '../../../types';
 import { categoryMap } from '../../../utils/constants';
+
 
 
 // Шаблон для работы с инпут
@@ -22,9 +23,9 @@ type ICardActions = { onClick: (event: PointerEvent) => void };
 
 
 type CategoryKey = keyof typeof categoryMap;
-// export type ICardCatalog = Pick<IProduct, 'image' |  'category'>; 
+type ICardCatalog = Pick<IProduct, 'image' |  'category'>; 
 
-export class CardCatalog extends Card  {
+export class CardCatalog extends Card<ICardCatalog>  {
     protected categoryElement: HTMLElement;
     protected imageElement: HTMLImageElement;
 

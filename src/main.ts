@@ -6,23 +6,109 @@ import {BoxWithBuy} from './components/models/BoxWithBuy';
 import {CommunicationLayer} from './components/communication/CommunicationLayer';
 import {Api} from './components/base/Api';
 import {EventEmitter} from './components/base/Events';
+import {ensureElement} from './utils/utils';
 
-import {apiProducts} from './utils/data';
+//import {apiProducts} from './utils/data';
 
 import {API_URL} from './utils/constants';
+import {CDN_URL} from './utils/constants';
 
 // 9 спринт import Header
 import {Header} from './components/view/Header';
+import {Modal} from './components/view/Modal';
+import {Gallery} from './components/view/Gallery';
 import { CardCatalog } from './components/view/Card/CardCatalog';
 import { cloneTemplate } from './utils/utils';
 
 
-// Создание экземпляра ProductsСatalog
-const productsModel = new ProductsСatalog(); 
-productsModel.allProduct = apiProducts.items; 
+const actions = {
+    'basket:open': 'событие нажатие копки корзины',
+    'catalog:changed' : 'Слой данных Каталог изменён',
+    'card:select' : 'Выбор карточки для отображения',
+    'modal:close': 'Пока не назначено',
+    'modal:changed': 'Содержимое Модального окна изменено'
+};
+
+const HeaderHTML = document.querySelector('.header') as HTMLElement;
+const galleryHTML = document.querySelector('.gallery') as HTMLElement;
+const modalHTML = ensureElement<HTMLElement>('#modal-container');
+
+// Создание экземпляров Base
+const events = new EventEmitter;
+const urlApi = new Api(API_URL);
+
+// Создание экземпляров слоя Коммуникации
+const dataCommunicationLayer  = new CommunicationLayer(urlApi); // Создание экземпляра CommunicationLayer
+
+// Создание экземпляров слоя модели Данных
+const buyerModel = new Buyer(); // Создание экземпляра Покупателя
+const boxWithBuyModel = new BoxWithBuy(); // Создание экземпляра Корзины
+const productsModel = new ProductsСatalog(events); //  // Создание экземпляра Каталог продуктов
+
+// Создание экземпляров слоя Отображения
+const headerView = new Header(events, HeaderHTML); // Создание объекта Шапки
+const galleryModel = new Gallery(events, galleryHTML); // Создание объекта Галереи
+const modalView = new Modal(events, modalHTML);
+
+// Заполнения объектов модели Данных
+// Получаем список товаров с сервера методом Get
+dataCommunicationLayer.getProduct().then(products => {
+    const newProductsWithImage = products.items.map(product => ({  // Пересобираем данные товаров, добавляем полные пути к изображениям
+        ...product, 
+        image: `${CDN_URL}${product.image.replace(/\.svg$/i, '.png')}`
+    }));
+    
+    productsModel.allProduct = newProductsWithImage; // Запоминаем данные в модель данных Каталог продуктов
+}).catch(error => {
+    console.log('Ошибка получения списока товаров с сервера методом Get ', error);
+});
+
+// Обработка событий
+
+// Событие заполнения Галереи товарами
+// Передаём в созданный экземпляр функцию 
+events.on('catalog:changed', () => {
+    const itemCards = productsModel.allProduct.map((item) => {
+        const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');//(document.getElementById('card-catalog'));
+        const card = new CardCatalog(CardCatalogTemplate, {
+            onClick: () => {
+                events.emit('card:select', item);
+                productsModel.selectedProduct = item; // Записано значение Выбранной карточки в модель дпннвх
+            },
+        });
+        return card.render(item);
+    });
+
+    galleryModel.render({ catalog: itemCards }) //gallery.replaceChild({ catalog: itemCards.filter(card => card !== null) });
+}); 
+
+// Событие открытия корзины headerView слоя View      +
+events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
+	console.log("Сработало событие нажатие копки корзины")
+    headerView.counter = 1;     // Render срабатывает автоматически
+    headerView.render({counter:2}); // Перпедаём в Render обьект для отрисовки
+});  
+
+// Событие Открытие карточки
+events.on('card:select', () => {    // Событие нажатия на кнопку корзины в шапке
+	console.log(`Сработало событие выбора карточки галареи`);
+    headerView.counter = 1;
+    // = productsModel.selectedProduct;
+    // modalView.content = ;
+    modalHTML.classList.add('modal_active');
+})  
+
+
+
+/*
+.allProduct
+.selectedProduct
+.getProduct
 
 console.log('Экземпляр ProductСatalog'); 
+productsModel.allProduct = apiProducts.items; 
 console.log('Массив товаров из каталога: ', productsModel.allProduct); 
+
 
 const testProduct = {
     category : "софт-скил",
@@ -36,9 +122,7 @@ productsModel.selectedProduct = testProduct;
 console.log('Выбранный товар из каталога: ', productsModel.selectedProduct); 
 console.log('Поиск по ID товара из каталога: ', productsModel.getProduct("b06cde61-912f-4663-9751-09956c0eed67")); 
 
-
-// Создание экземпляра Buyer
-const buyerModel = new Buyer();
+// Тестирование экземпляра Buyer
 
 console.log('Экземпляр Buyer'); 
 console.log(`Проверка не заполненного поля оплаты: ${buyerModel.validPayment()}`);
@@ -62,78 +146,22 @@ console.log(`Проверка заполненного поля телефона
 console.log(buyerModel.phone);
 console.log('Получение значений экземпляра Buyer', buyerModel.getDataBuyer());
 
-// Создание экземпляра BoxWithBuy
-const boxWithBuyModel = new BoxWithBuy(); 
+// Тестирование Экземпляра Корзина
 console.log('Экземпляр BoxWithBuy'); 
 console.log('Товары выбранные покупателоем (если не выбраны то массив пустой): ', boxWithBuyModel.selectedProducts);
-boxWithBuyModel.addProduct(testProduct);
+//boxWithBuyModel.addProduct(testProduct);
 console.log('Добавляем товар: ', boxWithBuyModel.selectedProducts);
 console.log('Получение стоимости всех товаров в корзине: ', boxWithBuyModel.costSelectedProducts());
 console.log('Получение количества товаров в корзине: ', boxWithBuyModel.numberSelectedProducts());
 console.log('Проверка товара в корзине покупателя: ', boxWithBuyModel.checkProduct("854cef69-976d-4c2a-a18c-2aa45046c390"));
-boxWithBuyModel.deleteProduct(testProduct);
+//boxWithBuyModel.deleteProduct(testProduct);
 console.log('Удаляем товар: ', boxWithBuyModel.selectedProducts);
+*/
 
-//Создание экземпляра CommunicationLayer
-const pingCommunicationLayer = new Api(API_URL); 
-const pongCommunicationLayer  = new CommunicationLayer(pingCommunicationLayer);
+/*
+inputElement.addEventListener('input', (event: Event) => {
+const inputValue = (event.target as HTMLInputElement).value;
+console.log('Input value:', inputValue);};
+const CardCatalogTemplate = document.getElementById('card-catalog');
+*/
 
-console.log('Экземпляр CommunicationLayer'); 
-pongCommunicationLayer.getProduct().then(product => {
-    console.log('Получаем список товаров с сервера методом Get ', product);
-}).catch(error => {
-    console.log('Ошибка получения списока товаров с сервера методом Get ', error);
-});
-
-
-// 9 спринт 
-// Для отображения компонентов можно использовать элемент <main class="gallery"></main>
-const gallery = document.querySelector('.gallery') as HTMLElement;
-//  Для проверки работы компонента можете использовать метод gallery.replaceChildren(component.render())
-
-const events = new EventEmitter;
-
-// Проверка компонента headerView слоя View      +
-const HeaderHTML = document.querySelector('.header') as HTMLElement;
-const headerView = new Header(events, HeaderHTML);
-
-
-events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
-		console.log("Сработало событие нажатие копки корзины")
-        headerView.counter = 1;     // Render срабатывает автоматически
-        headerView.render({counter:2}); // Перпедаём в Render обьект для отрисовки
-	});  
-
-// =================
-// Модель данных наполнение
-console.log('Передаём данные с севреар в модель данных');
-pongCommunicationLayer.getProduct().then(product => {
-    productsModel.allProduct = [];
-    console.log(productsModel.allProduct); 
-    console.log('Модель данных наполнение, Получаем список товаров с сервера методом Get ', product);
-    productsModel.allProduct = product.items;
-    console.log('Поиск по ID товара из каталога: ', productsModel.getProduct("b06cde61-912f-4663-9751-09956c0eed67")); 
-});
-
-events.on( 'basket:open', () => {  // 'catalog:changed'
-    const itemCards = productsModel.allProduct.map((item) => {
-        console.log(item);
-        const CardCatalogTemplate = document.getElementById('card-catalog');
-        console.log(CardCatalogTemplate);
-
-        if (CardCatalogTemplate) {
-            const card = new CardCatalog(cloneTemplate(CardCatalogTemplate), {
-                onClick: () => events.emit('card:select', item),
-            });
-            return card.render(item);
-        } else {
-            // Обработка случая, когда шаблон не найден
-            console.error('Template not found');
-            return null; // или другой подходящий объект
-        }
-    });
-
-    gallery.replaceChild({ catalog: itemCards.filter(card => card !== null) });
-});  
-
-// Проверка компонента CardCatalog слоя View      
