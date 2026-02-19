@@ -1,6 +1,6 @@
 import './scss/styles.scss';
 
-import {ProductsСatalog} from './components/models/ProductСatalog';
+import {ProductsCatalog} from './components/models/ProductCatalog';
 import {Buyer} from './components/models/Buyer';
 import {BoxWithBuy} from './components/models/BoxWithBuy';
 import {CommunicationLayer} from './components/communication/CommunicationLayer';
@@ -18,7 +18,10 @@ import {Header} from './components/view/Header';
 import {Modal} from './components/view/Modal';
 import {Gallery} from './components/view/Gallery';
 import { CardCatalog } from './components/view/Card/CardCatalog';
+import { CardPreview } from './components/view/Card/CardPreview';
 import { cloneTemplate } from './utils/utils';
+import {OrderSuccess} from './components/view/orderSuccess';
+import {Basket} from './components/view/Basket';
 
 
 const actions = {
@@ -26,12 +29,21 @@ const actions = {
     'catalog:changed' : 'Слой данных Каталог изменён',
     'card:select' : 'Выбор карточки для отображения',
     'modal:close': 'Пока не назначено',
-    'modal:changed': 'Содержимое Модального окна изменено'
+    'modal:changed': 'Содержимое Модального окна изменено',
+    'product:add': 'Товар добавлен в корзину',
+    'order_success:close': 'Событие в модалоьном окне успешного заказа - не назначено',
+    'basket:change': 'Слой данных корзины изменён',
+    'basket:order': 'Нажата кнопка оформления заказа'
 };
 
 const HeaderHTML = document.querySelector('.header') as HTMLElement;
 const galleryHTML = document.querySelector('.gallery') as HTMLElement;
 const modalHTML = ensureElement<HTMLElement>('#modal-container');
+//const cardPreviewlHTML = ensureElement<HTMLElement>('#card-preview');
+const cardPreviewlHTML = cloneTemplate('#card-preview');
+const orderSuccessHTML = cloneTemplate('#success');
+const basketHTML = cloneTemplate('#basket');
+
 
 // Создание экземпляров Base
 const events = new EventEmitter;
@@ -43,12 +55,35 @@ const dataCommunicationLayer  = new CommunicationLayer(urlApi); // Создан�
 // Создание экземпляров слоя модели Данных
 const buyerModel = new Buyer(); // Создание экземпляра Покупателя
 const boxWithBuyModel = new BoxWithBuy(); // Создание экземпляра Корзины
-const productsModel = new ProductsСatalog(events); //  // Создание экземпляра Каталог продуктов
+const productsModel = new ProductsCatalog(events); //  // Создание экземпляра Каталог продуктов
 
 // Создание экземпляров слоя Отображения
 const headerView = new Header(events, HeaderHTML); // Создание объекта Шапки
 const galleryModel = new Gallery(events, galleryHTML); // Создание объекта Галереи
-const modalView = new Modal(events, modalHTML);
+
+// Создание экземпляров Модальных окон слоя Отображения
+const orderSuccessView = new OrderSuccess(events, orderSuccessHTML); // Создание объекта Галереи слоя отображения
+const basketView = new Basket(events, basketHTML); // Создание объекта корзины слоя отображения
+
+
+const testProduct = {
+    category : "софт-скил",
+    description : "Если планируете решать задачи в тренажёре, берите два.",
+    id : "854cef69-976d-4c2a-a18c-2aa45046c390",
+    image : "/5_Dots.svg",
+    price : 750,
+    title : "+1 час в сутках",
+};
+
+const modalView = new Modal(events, modalHTML); // Создание объекта Модальное Окно
+modalView.content = cardPreviewlHTML; 
+const modalCardPreview = new CardPreview(events, modalHTML, {
+    onClick: () => {
+        events.emit('product:add');
+        boxWithBuyModel.addProduct(productsModel.selectedProduct);
+        console.log(boxWithBuyModel.selectedProducts)
+    },
+});
 
 // Заполнения объектов модели Данных
 // Получаем список товаров с сервера методом Get
@@ -60,20 +95,26 @@ dataCommunicationLayer.getProduct().then(products => {
     
     productsModel.allProduct = newProductsWithImage; // Запоминаем данные в модель данных Каталог продуктов
 }).catch(error => {
-    console.log('Ошибка получения списока товаров с сервера методом Get ', error);
+    console.log('Ошибка получения списока товаров от сервера методом Get ', error);
 });
 
 // Обработка событий
 
 // Событие заполнения Галереи товарами
 // Передаём в созданный экземпляр функцию 
+//orderSuccessView.description= 1;
+
+// Проверка ниже раскоментить
+
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');//(document.getElementById('card-catalog'));
         const card = new CardCatalog(CardCatalogTemplate, {
             onClick: () => {
                 events.emit('card:select', item);
-                productsModel.selectedProduct = item; // Записано значение Выбранной карточки в модель дпннвх
+                productsModel.selectedProduct = item; // Присваиваем значение Выбранной карточки в модель данных
+                modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
+                modalHTML.classList.add('modal_active');   // Показываем Модальное окно
             },
         });
         return card.render(item);
@@ -81,6 +122,7 @@ events.on('catalog:changed', () => {
 
     galleryModel.render({ catalog: itemCards }) //gallery.replaceChild({ catalog: itemCards.filter(card => card !== null) });
 }); 
+
 
 // Событие открытия корзины headerView слоя View      +
 events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
@@ -92,10 +134,12 @@ events.on('basket:open', () => {    // Событие нажатия на кно
 // Событие Открытие карточки
 events.on('card:select', () => {    // Событие нажатия на кнопку корзины в шапке
 	console.log(`Сработало событие выбора карточки галареи`);
-    headerView.counter = 1;
-    // = productsModel.selectedProduct;
-    // modalView.content = ;
-    modalHTML.classList.add('modal_active');
+    console.log(productsModel.selectedProduct?.id);
+    //headerView.counter = 1;
+    //console.log(productsModel.selectedProduct);
+    //modalCardPreview.render(productsModel.selectedProduct);
+    //modalView.content = modalCardPreview;
+    //modalHTML.classList.add('modal_active');
 })  
 
 

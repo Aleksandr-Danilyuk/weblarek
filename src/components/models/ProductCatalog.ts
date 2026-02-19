@@ -1,7 +1,7 @@
 import {IProduct} from "../../types";
 import {IEvents} from '../base/Events';
 
-export class ProductsСatalog {
+export class ProductsCatalog {
     // Поля класса : 
     private _allProduct!: IProduct[];     // хранит массив всех товаров;
     private _selectedProduct: IProduct | null = null;  // хранит товар, выбранный для подробного отображения, изначально товар не выбран;
