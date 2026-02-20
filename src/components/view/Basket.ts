@@ -22,7 +22,7 @@ import {IEvents} from '../base/Events';
 
 interface IBasket {  
   list: HTMLElement[];
-  prise: string;
+  prise: number;
 }  
 
 
@@ -51,7 +51,7 @@ export class Basket extends Component<IBasket>  {
         this.events.emit('basket:change');
     };
 
-    set prise(value: string) {
+    set prise(value: number) {
         this.basketPrise.textContent = `${value} синапсов`;
     };
 

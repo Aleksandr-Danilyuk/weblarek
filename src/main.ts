@@ -56,7 +56,7 @@ const dataCommunicationLayer  = new CommunicationLayer(urlApi); // Создан�
 
 // Создание экземпляров слоя модели Данных
 const buyerModel = new Buyer(); // Создание экземпляра Покупателя
-const boxWithBuyModel = new BoxWithBuy(); // Создание экземпляра Корзины
+const boxWithBuyModel = new BoxWithBuy(events); // Создание экземпляра Корзины
 const productsModel = new ProductsCatalog(events); //  // Создание экземпляра Каталог продуктов
 
 // Создание экземпляров слоя Отображения
@@ -77,13 +77,26 @@ const testProduct = {
     title : "+1 час в сутках",
 };
 
+
 const modalView = new Modal(events, modalHTML); // Создание объекта Модальное Окно
 modalView.content = cardPreviewlHTML; 
+
 const modalCardPreview = new CardPreview(events, modalHTML, {
     onClick: () => {
-        events.emit('product:add');
+        //events.emit('product:add');
+        if (productsModel.selectedProduct?.price === null) {
+        console.log('Деактивация кнопки');
+        };
+        if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
         boxWithBuyModel.addProduct(productsModel.selectedProduct);
-        console.log(boxWithBuyModel.selectedProducts)
+        console.log('Товар добавлен в корзину');
+        console.log('Замена кнопки Удалить из корзины');
+        } else if (productsModel.selectedProduct) {
+        boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
+        console.log('Товар удалён из корзины');
+        console.log('Замена кнопки Купить');
+        };
+        //console.log(boxWithBuyModel.selectedProducts);
     },
 });
 
@@ -113,10 +126,11 @@ events.on('catalog:changed', () => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');//(document.getElementById('card-catalog'));
         const card = new CardCatalog(CardCatalogTemplate, {
             onClick: () => {
-                events.emit('card:select', item);
+                //events.emit('card:select', item);
                 productsModel.selectedProduct = item; // Присваиваем значение Выбранной карточки в модель данных
                 modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
                 modalHTML.classList.add('modal_active');   // Показываем Модальное окно
+                events.emit('card:select', item);
             },
         });
         return card.render(item);
@@ -137,6 +151,7 @@ events.on('basket:open', () => {    // Событие нажатия на кно
 events.on('card:select', () => {    // Событие нажатия на кнопку корзины в шапке
 	console.log(`Сработало событие выбора карточки галареи`);
     console.log(productsModel.selectedProduct?.id);
+    
     //headerView.counter = 1;
     //console.log(productsModel.selectedProduct);
     //modalCardPreview.render(productsModel.selectedProduct);
@@ -144,8 +159,29 @@ events.on('card:select', () => {    // Событие нажатия на кно
     //modalHTML.classList.add('modal_active');
 })  
 
+// Событие Добавление товара в корзину
+events.on('basket:changed', () => {    
+    headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
+    console.log(boxWithBuyModel.selectedProducts);
+});
+/*
+events.on('basket:changed', () => {    // Событие нажатия на кнопку корзины в шапке
+    headerView.render({counter:boxWithBuyModel.numberSelectedProducts()}); 
+    const cardsBasket = boxWithBuyModel.selectedProducts.map((item) => {
+        const cardBasket = new CardBasket(events, cardBasketHTML, {
+            onClick: () => {
+                boxWithBuyModel.deleteProduct(item); // Присваиваем значение Выбранной карточки в модель данных
+                events.emit('card:delete', item);
+                //modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
+            },
+        });
+        return cardBasket.render(item);
+    });
+    basketView.render({list: cardsBasket, prise:boxWithBuyModel.costSelectedProducts()});
+    //console.log(boxWithBuyModel.selectedProducts)  
+})  
 
-
+*/
 /*
 .allProduct
 .selectedProduct

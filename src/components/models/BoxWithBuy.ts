@@ -1,4 +1,5 @@
 import {IProduct} from "../../types";
+import {IEvents} from '../base/Events';
 
 // Класс реализует хранение товаров, которые пользователь выбрал для покупки;
 export class BoxWithBuy {
@@ -6,7 +7,7 @@ export class BoxWithBuy {
     private _selectedProducts: IProduct[] ; // поле хранит массив товаров, выбранных покупателем для покупки 
 
     // Конструктор класса не принимает параметров. Так как изначально корзина пустая.
-    constructor() {
+    constructor(protected events:IEvents) {
         this._selectedProducts = new Array<IProduct>();
     }
 
@@ -14,11 +15,13 @@ export class BoxWithBuy {
     // добавление товара, который был получен в параметре, в массив корзины
     addProduct(product: IProduct) {
         this._selectedProducts.push(product);
+        this.events.emit('basket:changed');
     }
 
     // удаление товара, полученного в параметре из массива корзины
     deleteProduct(product: IProduct) {
         this._selectedProducts = this._selectedProducts.filter(elem => elem != product);
+        this.events.emit('basket:changed');
     }
 
     // получение массива товаров, которые находятся в корзине
@@ -29,6 +32,7 @@ export class BoxWithBuy {
     // очистка корзины
     cleanSelectedProducts() {
         this._selectedProducts = this._selectedProducts.splice(0);
+        this.events.emit('basket:changed');
     }
 
     // получение стоимости всех товаров в корзине
