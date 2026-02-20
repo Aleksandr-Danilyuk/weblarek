@@ -17,9 +17,10 @@ import {CDN_URL} from './utils/constants';
 import {Header} from './components/view/Header';
 import {Modal} from './components/view/Modal';
 import {Gallery} from './components/view/Gallery';
-import { CardCatalog } from './components/view/Card/CardCatalog';
-import { CardPreview } from './components/view/Card/CardPreview';
-import { cloneTemplate } from './utils/utils';
+import {CardCatalog} from './components/view/Card/CardCatalog';
+import {CardPreview} from './components/view/Card/CardPreview';
+import {CardBasket} from './components/view/Card/CardBasket';
+import {cloneTemplate} from './utils/utils';
 import {OrderSuccess} from './components/view/orderSuccess';
 import {Basket} from './components/view/Basket';
 
@@ -43,6 +44,7 @@ const modalHTML = ensureElement<HTMLElement>('#modal-container');
 const cardPreviewlHTML = cloneTemplate('#card-preview');
 const orderSuccessHTML = cloneTemplate('#success');
 const basketHTML = cloneTemplate('#basket');
+const cardBasketHTML = cloneTemplate('#card-basket');
 
 
 // Создание экземпляров Base
