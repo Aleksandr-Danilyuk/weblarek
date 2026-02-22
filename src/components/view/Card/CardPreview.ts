@@ -25,7 +25,7 @@ import {IEvents} from '../../base/Events';
 type ICardPreviewActions = { onClick: (event: PointerEvent) => void };
 
 type CategoryKey = keyof typeof categoryMap;
-type ICardPreview = Pick<IProduct, 'description' | 'image' |  'category'>; 
+type ICardPreview = Pick<IProduct, 'description' | 'image' |  'category'> & {textCardButton?: string}; 
 
 export class CardPreview extends Card<ICardPreview>  {
     protected descriptionElement: HTMLElement;
@@ -65,4 +65,15 @@ export class CardPreview extends Card<ICardPreview>  {
         this.setImage(this.imageElement, value, this.title);
     }
 
+    disabledButton(){
+        this.cardButton.disabled = true;
+    }
+
+    enabledButton(){
+        this.cardButton.disabled = false;
+    }
+
+    set textCardButton(value: string) {
+        this.cardButton.textContent = value;
+    }
 }

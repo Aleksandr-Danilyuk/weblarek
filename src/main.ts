@@ -62,7 +62,7 @@ const urlApi = new Api(API_URL);
 const dataCommunicationLayer  = new CommunicationLayer(urlApi); // Создание экземпляра CommunicationLayer
 
 // Создание экземпляров слоя модели Данных
-const buyerModel = new Buyer(); // Создание экземпляра Покупателя
+const buyerModel = new Buyer(events); // Создание экземпляра Покупателя
 const boxWithBuyModel = new BoxWithBuy(events); // Создание экземпляра Корзины
 const productsModel = new ProductsCatalog(events); //  // Создание экземпляра Каталог продуктов
 
@@ -87,9 +87,6 @@ const testProduct = {
 };
 */
 
-
-
-
 // Заполнения объектов модели Данных
 // Получаем список товаров с сервера методом Get
 dataCommunicationLayer.getProduct().then(products => {
@@ -104,13 +101,19 @@ dataCommunicationLayer.getProduct().then(products => {
 });
 
 // Обработка событий
-
-// Событие заполнения Галереи товарами
 // Передаём в созданный экземпляр функцию 
 //orderSuccessView.description= 1;
 
-// Проверка ниже раскоментить
+// Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
+document.addEventListener('click', (event) => {
+    if (event.target === modalHTML) {
+        modalHTML.classList.remove('modal_active');
+        
+    };
+});
 
+
+// Событие заполнения Галереи товарами      +
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');//(document.getElementById('card-catalog'));
@@ -126,13 +129,19 @@ events.on('catalog:changed', () => {
     galleryModel.render({ catalog: itemCards }) //gallery.replaceChild({ catalog: itemCards.filter(card => card !== null) });
 }); 
 
-
-
 // Событие нажатие на кнопке  слоя View      +
 const modalCardPreview = new CardPreview(events, cardPreviewlHTML, {
     onClick: () => {
-        boxWithBuyModel.addProduct(productsModel.selectedProduct);
-        console.log('Presenter добавляет карточку в корзину');
+        //console.log('Presenter добавляет карточку в корзину');
+        if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
+                boxWithBuyModel.addProduct(productsModel.selectedProduct);
+                console.log('Товар добавлен в корзину');
+                modalCardPreview.textCardButton = 'Удалить из корзины';
+        } else if (productsModel.selectedProduct) {
+                boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
+                console.log('Товар удалён из корзины');
+                modalCardPreview.textCardButton = 'Купить';
+        };
     }
 });
 
@@ -144,7 +153,16 @@ events.on('card:click', () => {    // Событие нажатия на кно�
 
 events.on('card:select', () => {    // Событие нажатия на кнопку корзины в шапке
     console.log('Сохранение товара для подробного отображения card:select Класс ProductsCatalog');
-    console.log('Событие для отрисовки карточки');
+    if (productsModel.selectedProduct?.price === null) {
+        modalCardPreview.disabledButton();
+    } else {
+        modalCardPreview.enabledButton();
+    };
+    if (!boxWithBuyModel.checkProduct(productsModel.selectedProduct!.id)) {
+        modalCardPreview.textCardButton = 'Купить';
+        console.log('Отрисовываем кнопку Купить');
+    };
+
     modalCardPreview.render({
         title: productsModel.selectedProduct?.title, 
         price: productsModel.selectedProduct?.price, 
@@ -154,37 +172,6 @@ events.on('card:select', () => {    // Событие нажатия на кно
     });
 });  
 
-
-/*// Событие карточка выбрана для подробного просмотра +
-events.on('card:select', () => {    
-    modalView.content = cardPreviewlHTML;
-    const modalCardPreview = new CardPreview(events, modalHTML, {
-        onClick: () => {
-            if (productsModel.selectedProduct?.price === null) {
-            console.log('Дописать Деактивация кнопки');
-            };
-            if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
-                boxWithBuyModel.addProduct(productsModel.selectedProduct);
-                console.log('Товар добавлен в корзину');
-                console.log('Дописать Замена кнопки Удалить из корзины');
-            } else if (productsModel.selectedProduct) {
-                boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
-                console.log('Товар удалён из корзины');
-                console.log('Дописать Замена кнопки Купить');
-            };
-        },
-    });
-     
-    modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
-    modalView.show();
-    //modalHTML.classList.add('modal_active');   // Показываем Модальное окно
-    console.log(`Сработало событие выбора карточки галареи`);
-    console.log(productsModel.selectedProduct?.id);
-
-});
-*/
-
-
 // Событие открытия корзины headerView слоя View      +
 events.on('basket:click', () => {    // Событие нажатия на кнопку корзины в шапке
 	console.log("Сработало событие нажатие копки корзины !")
@@ -193,7 +180,7 @@ events.on('basket:click', () => {    // Событие нажатия на кн�
 });  
 
 
-// Событие Добавление товара в корзину
+// Событие Добавление товара в корзину +
 events.on('basket:changed', () => {   
     headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
     let itemCount = 0;
