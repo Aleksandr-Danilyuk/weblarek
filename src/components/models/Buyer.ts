@@ -21,7 +21,8 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа.
     set payment(valuePayment: TPayment) {
         this._payment = valuePayment;
-        this.events.emit('buyer_payment:changed');
+        //this.events.emit('buyer_payment:changed');
+        this.events.emit('form_order:changed');
     }
 
     //  получает выбранный покупателем способ оплаты заказа
@@ -32,7 +33,8 @@ export class Buyer implements IBuyer {
     // сохраняет адрес доставки товара
     set address(valueAddress: string) {
         this._address = valueAddress;
-        this.events.emit('buyer_address:changed');
+        //this.events.emit('buyer_address:changed');
+        this.events.emit('form_order:changed');
     }
 
     // получает адрес доставки товара
@@ -43,7 +45,8 @@ export class Buyer implements IBuyer {
     // сохраняет электронный адрес покупателя
     set email(valueEmail: string) {
         this._email = valueEmail;
-        this.events.emit('buyer_email:changed');
+        //this.events.emit('buyer_email:changed');
+        this.events.emit('form_order:changed');
     }
     
     // получает электронный адрес покупателя
@@ -54,7 +57,8 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа
     set phone(valuePhone: string) {
         this._phone = valuePhone;
-        this.events.emit('buyer_phone:changed');
+        //this.events.emit('buyer_phone:changed');
+        this.events.emit('form_order:changed');
     }
 
     // получает выбранный покупателем способ оплаты заказа
@@ -78,7 +82,8 @@ export class Buyer implements IBuyer {
         this.address = '';
         this.email = '';
         this.phone = '';
-        this.events.emit('buyer:clean');
+        //this.events.emit('buyer:clean');
+        this.events.emit('form_order:changed');
     }
 
     // метод реализующий валидацию способа оплаты заказа

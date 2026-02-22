@@ -41,7 +41,6 @@ export class Basket extends Component<IBasket>  {
 
         this.basketButton.addEventListener('click', () => {
             this.events.emit('basket:order');
-            console.log('Нажата кнопка в корзине Basket basket:order');
         });
     };
 
@@ -56,6 +55,13 @@ export class Basket extends Component<IBasket>  {
         this.basketPrise.textContent = `${value} синапсов`;
     };
 
+    disabledButton(){
+        this.basketButton.disabled = true;
+    }
+
+    enabledButton(){
+        this.basketButton.disabled = false;
+    }
    // set description(value: number = 0) {
     //    const cost = String(value);
     //    this.orderSuccessDescription.textContent = `Списано ${cost} синапсов`;

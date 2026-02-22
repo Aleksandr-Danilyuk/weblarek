@@ -30,14 +30,26 @@ export class FormContacts extends Form<IFormContacts> {
     constructor(protected events:IEvents, container: HTMLFormElement) {
         super(container);
 
-        this.emailFormInput = this.container.getElementById('email') as HTMLInputElement;
-        this.phoneFormInput = this.container.getElementById('phone') as HTMLInputElement;
+        this.emailFormInput = ensureElement<HTMLInputElement>('input[name="email"]', this.container);
+        this.phoneFormInput = ensureElement<HTMLInputElement>('input[name="phone"]', this.container);
         this.orderButtonSubmit = ensureElement<HTMLButtonElement>('.button', this.container);
+        //this.orderButtonSubmit = this.container.querySelector('.button') as HTMLButtonElement;
 
-        this.orderButtonSubmit.addEventListener('click', () => {
-            this.events.emit('formOrder:submit');
+        this.emailFormInput.addEventListener('input', () => {
+            this.events.emit('form_order:email', {email: this.emailFormInput.value});
         });
 
+        this.phoneFormInput.addEventListener('input', () => {
+            this.events.emit('form_order:phone', {phone: this.orderButtonSubmit.value});
+        });
+
+        this.orderButtonSubmit.addEventListener('click', () => {
+            this.events.emit('form_order:next');
+        });
+    }
+
+    enabledButton(){
+        this.orderButtonSubmit.disabled = false;
     }
 
 }
