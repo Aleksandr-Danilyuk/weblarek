@@ -1,4 +1,5 @@
 import {IBuyer} from "../../types";
+import {IEvents} from '../base/Events';
 
 type TPayment = 'card' | 'cash' | '';
 
@@ -9,7 +10,7 @@ export class Buyer implements IBuyer {
     private _email: string; // поле для хранения электронного адреса покупателя. 
     private _phone: string; // поле для хранения телефонного номера покупателя. 
 
-    constructor() {
+    constructor(protected events:IEvents) {
         this._payment = '';
         this._address = '';
         this._email = '';
@@ -20,6 +21,7 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа.
     set payment(valuePayment: TPayment) {
         this._payment = valuePayment;
+        this.events.emit('buyer_payment:changed');
     }
 
     //  получает выбранный покупателем способ оплаты заказа
@@ -30,6 +32,7 @@ export class Buyer implements IBuyer {
     // сохраняет адрес доставки товара
     set address(valueAddress: string) {
         this._address = valueAddress;
+        this.events.emit('buyer_address:changed');
     }
 
     // получает адрес доставки товара
@@ -40,6 +43,7 @@ export class Buyer implements IBuyer {
     // сохраняет электронный адрес покупателя
     set email(valueEmail: string) {
         this._email = valueEmail;
+        this.events.emit('buyer_email:changed');
     }
     
     // получает электронный адрес покупателя
@@ -50,6 +54,7 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа
     set phone(valuePhone: string) {
         this._phone = valuePhone;
+        this.events.emit('buyer_phone:changed');
     }
 
     // получает выбранный покупателем способ оплаты заказа
@@ -73,7 +78,7 @@ export class Buyer implements IBuyer {
         this.address = '';
         this.email = '';
         this.phone = '';
-    
+        this.events.emit('buyer:clean');
     }
 
     // метод реализующий валидацию способа оплаты заказа

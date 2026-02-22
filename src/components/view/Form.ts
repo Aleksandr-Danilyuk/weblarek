@@ -14,7 +14,7 @@ interface IForm {
   validationError: string; 
 }  
 
-export class Form extends Component<IForm> {
+export class Form<T> extends Component<IForm & T> {
     protected formErrorsElement: HTMLElement;
 
     constructor(container: HTMLElement) {

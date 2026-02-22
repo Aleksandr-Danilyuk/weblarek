@@ -41,6 +41,7 @@ export class Basket extends Component<IBasket>  {
 
         this.basketButton.addEventListener('click', () => {
             this.events.emit('basket:order');
+            console.log('Нажата кнопка в корзине Basket basket:order');
         });
     };
 

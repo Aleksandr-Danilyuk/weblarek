@@ -2,6 +2,7 @@ import {Card} from './Card';
 import {ensureElement} from '../../../utils/utils';
 import { IProduct } from '../../../types';
 import { categoryMap } from '../../../utils/constants';
+import {IEvents} from '../../base/Events';
 
 
 
@@ -29,15 +30,14 @@ export class CardCatalog extends Card<ICardCatalog>  {
     protected categoryElement: HTMLElement;
     protected imageElement: HTMLImageElement;
 
-    constructor(container: HTMLElement, actions?: ICardActions) {
+    constructor(protected events:IEvents, container: HTMLElement, actions?: ICardActions) {
         super(container);
 
         this.categoryElement = ensureElement<HTMLElement>('.card__category', this.container);
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', this.container);
 
-
         if (actions?.onClick) {
-            this.container.addEventListener('click', actions.onClick)
+            this.container.addEventListener('click', actions.onClick);
         };
     }
 

@@ -15,6 +15,7 @@ export class ProductsCatalog {
     public set allProduct (arrayProduct: IProduct[]) {
         this._allProduct = arrayProduct;
         this.events.emit('catalog:changed');
+        console.log('Сохранение массива товаров set allProduct Класс ProductsCatalog');
     }
     
     // получение массива товаров из модели;
@@ -25,6 +26,7 @@ export class ProductsCatalog {
     // сохранение товара для подробного отображения;
     set selectedProduct(product: IProduct) {
         this._selectedProduct = product;
+        this.events.emit('card:select');
     }
 
     // получение товара для подробного отображения

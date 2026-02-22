@@ -1,6 +1,7 @@
 import {Form} from '../view/Form';
 import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
+import { IBuyer } from '../../types';
 //import {GalleryData} from "../../types";
 
 // Шаблон для работы с инпут
@@ -19,8 +20,9 @@ import {ensureElement} from '../../utils/utils';
 //          onClick: (event) => {console.log('Card selected');}
 //      });
 
+type IFormContacts = Pick<IBuyer, 'email' | 'phone'> 
 
-export class FormContacts extends Form {
+export class FormContacts extends Form<IFormContacts> {
     protected emailFormInput: HTMLInputElement;
     protected phoneFormInput: HTMLInputElement;
     protected orderButtonSubmit: HTMLButtonElement;

@@ -43,6 +43,7 @@ export class CardPreview extends Card<ICardPreview>  {
 
         if (actions?.onClick) {
             this.cardButton.addEventListener('click', actions.onClick)
+            this.events.emit('cardPreview:click');
         };
     }
 

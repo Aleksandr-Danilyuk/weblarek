@@ -26,26 +26,33 @@ import {Basket} from './components/view/Basket';
 
 
 const actions = {
-    'basket:open': 'событие нажатие копки корзины',
+    'basket:click': 'событие нажатие копки корзины',
     'catalog:changed' : 'Слой данных Каталог изменён',
-    'card:select' : 'Выбор карточки для отображения',
+    'card:select' : 'Запись карточки для отображения Model' ,
     'modal:close': 'Пока не назначено',
     'modal:changed': 'Содержимое Модального окна изменено',
     'product:add': 'Товар добавлен в корзину',
     'order_success:close': 'Событие в модалоьном окне успешного заказа - не назначено',
     'basket:change': 'Слой данных корзины изменён',
-    'basket:order': 'Нажата кнопка оформления заказа'
+    'buyer_data:changed': 'изменение данных покупателя',
+    'buyer:clean': 'обнуление данных покупателя',
+    'buyer_payment': 'Изменён способ оплаты заказа',
+    'buyer_address': 'Изменён адрес заказа',
+    'buyer_email': 'Изменён электронный адрес покупателя',
+    'buyer_phone': 'Изменён телефонный номер покупателя',
+    'form:order': 'Нажата кнопка перехода ко второй форме оформления заказа',
+    'form:complete': 'Нажата кнопка оформления заказа',
+    'cardBasket:click_delete': 'Нажатие удаления карточки из корзины',
+    'cardPreview:click': 'Пока не назначено',
+    'card:click': 'Событие нажатие копки карточки в Галереи View'
 };
 
 const HeaderHTML = document.querySelector('.header') as HTMLElement;
 const galleryHTML = document.querySelector('.gallery') as HTMLElement;
 const modalHTML = ensureElement<HTMLElement>('#modal-container');
-//const cardPreviewlHTML = ensureElement<HTMLElement>('#card-preview');
 const cardPreviewlHTML = cloneTemplate('#card-preview');
 const orderSuccessHTML = cloneTemplate('#success');
 const basketHTML = cloneTemplate('#basket');
-const cardBasketHTML = cloneTemplate('#card-basket');
-
 
 // Создание экземпляров Base
 const events = new EventEmitter;
@@ -60,14 +67,16 @@ const boxWithBuyModel = new BoxWithBuy(events); // Создание экземп
 const productsModel = new ProductsCatalog(events); //  // Создание экземпляра Каталог продуктов
 
 // Создание экземпляров слоя Отображения
+const modalView = new Modal(events, modalHTML); // Создание объекта Модальное Окно
 const headerView = new Header(events, HeaderHTML); // Создание объекта Шапки
 const galleryModel = new Gallery(events, galleryHTML); // Создание объекта Галереи
 
 // Создание экземпляров Модальных окон слоя Отображения
-const orderSuccessView = new OrderSuccess(events, orderSuccessHTML); // Создание объекта Галереи слоя отображения
 const basketView = new Basket(events, basketHTML); // Создание объекта корзины слоя отображения
+const orderSuccessView = new OrderSuccess(events, orderSuccessHTML); // Создание объекта Галереи слоя отображения
 
 
+/*
 const testProduct = {
     category : "софт-скил",
     description : "Если планируете решать задачи в тренажёре, берите два.",
@@ -76,29 +85,10 @@ const testProduct = {
     price : 750,
     title : "+1 час в сутках",
 };
+*/
 
 
-const modalView = new Modal(events, modalHTML); // Создание объекта Модальное Окно
-modalView.content = cardPreviewlHTML; 
 
-const modalCardPreview = new CardPreview(events, modalHTML, {
-    onClick: () => {
-        //events.emit('product:add');
-        if (productsModel.selectedProduct?.price === null) {
-        console.log('Деактивация кнопки');
-        };
-        if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
-        boxWithBuyModel.addProduct(productsModel.selectedProduct);
-        console.log('Товар добавлен в корзину');
-        console.log('Замена кнопки Удалить из корзины');
-        } else if (productsModel.selectedProduct) {
-        boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
-        console.log('Товар удалён из корзины');
-        console.log('Замена кнопки Купить');
-        };
-        //console.log(boxWithBuyModel.selectedProducts);
-    },
-});
 
 // Заполнения объектов модели Данных
 // Получаем список товаров с сервера методом Get
@@ -124,13 +114,10 @@ dataCommunicationLayer.getProduct().then(products => {
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');//(document.getElementById('card-catalog'));
-        const card = new CardCatalog(CardCatalogTemplate, {
+        const card = new CardCatalog(events, CardCatalogTemplate, {
             onClick: () => {
-                //events.emit('card:select', item);
+                events.emit('card:click');
                 productsModel.selectedProduct = item; // Присваиваем значение Выбранной карточки в модель данных
-                modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
-                modalHTML.classList.add('modal_active');   // Показываем Модальное окно
-                events.emit('card:select', item);
             },
         });
         return card.render(item);
@@ -140,48 +127,127 @@ events.on('catalog:changed', () => {
 }); 
 
 
-// Событие открытия корзины headerView слоя View      +
-events.on('basket:open', () => {    // Событие нажатия на кнопку корзины в шапке
-	console.log("Сработало событие нажатие копки корзины")
-    headerView.counter = 1;     // Render срабатывает автоматически
-    headerView.render({counter:2}); // Перпедаём в Render обьект для отрисовки
+
+// Событие нажатие на кнопке  слоя View      +
+const modalCardPreview = new CardPreview(events, cardPreviewlHTML, {
+    onClick: () => {
+        boxWithBuyModel.addProduct(productsModel.selectedProduct);
+        console.log('Presenter добавляет карточку в корзину');
+    }
+});
+
+events.on('card:click', () => {    // Событие нажатия на кнопку корзины в шапке
+	console.log("Сработало событие нажатие Карточки в Галерее")
+    modalView.content = cardPreviewlHTML;
+    modalView.show();
 });  
 
-// Событие Открытие карточки
 events.on('card:select', () => {    // Событие нажатия на кнопку корзины в шапке
-	console.log(`Сработало событие выбора карточки галареи`);
+    console.log('Сохранение товара для подробного отображения card:select Класс ProductsCatalog');
+    console.log('Событие для отрисовки карточки');
+    modalCardPreview.render({
+        title: productsModel.selectedProduct?.title, 
+        price: productsModel.selectedProduct?.price, 
+        description: productsModel.selectedProduct?.description, 
+        image: productsModel.selectedProduct?.image, 
+        category: productsModel.selectedProduct?.category
+    });
+});  
+
+
+/*// Событие карточка выбрана для подробного просмотра +
+events.on('card:select', () => {    
+    modalView.content = cardPreviewlHTML;
+    const modalCardPreview = new CardPreview(events, modalHTML, {
+        onClick: () => {
+            if (productsModel.selectedProduct?.price === null) {
+            console.log('Дописать Деактивация кнопки');
+            };
+            if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
+                boxWithBuyModel.addProduct(productsModel.selectedProduct);
+                console.log('Товар добавлен в корзину');
+                console.log('Дописать Замена кнопки Удалить из корзины');
+            } else if (productsModel.selectedProduct) {
+                boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
+                console.log('Товар удалён из корзины');
+                console.log('Дописать Замена кнопки Купить');
+            };
+        },
+    });
+     
+    modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
+    modalView.show();
+    //modalHTML.classList.add('modal_active');   // Показываем Модальное окно
+    console.log(`Сработало событие выбора карточки галареи`);
     console.log(productsModel.selectedProduct?.id);
-    
-    //headerView.counter = 1;
-    //console.log(productsModel.selectedProduct);
-    //modalCardPreview.render(productsModel.selectedProduct);
-    //modalView.content = modalCardPreview;
-    //modalHTML.classList.add('modal_active');
-})  
+
+});
+*/
+
+
+// Событие открытия корзины headerView слоя View      +
+events.on('basket:click', () => {    // Событие нажатия на кнопку корзины в шапке
+	console.log("Сработало событие нажатие копки корзины !")
+    modalView.content = basketHTML; 
+    modalView.show();
+});  
+
 
 // Событие Добавление товара в корзину
-events.on('basket:changed', () => {    
+events.on('basket:changed', () => {   
     headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
-    console.log(boxWithBuyModel.selectedProducts);
-});
-/*
-events.on('basket:changed', () => {    // Событие нажатия на кнопку корзины в шапке
-    headerView.render({counter:boxWithBuyModel.numberSelectedProducts()}); 
-    const cardsBasket = boxWithBuyModel.selectedProducts.map((item) => {
+    let itemCount = 0;
+    const basketCards = boxWithBuyModel.selectedProducts.map((item) => {
+        itemCount += 1;
+        const cardBasketHTML = cloneTemplate<HTMLElement>('#card-basket');
         const cardBasket = new CardBasket(events, cardBasketHTML, {
             onClick: () => {
-                boxWithBuyModel.deleteProduct(item); // Присваиваем значение Выбранной карточки в модель данных
-                events.emit('card:delete', item);
-                //modalCardPreview.render(productsModel.selectedProduct); // Отрисовываем значение Выбранной карточки
+                boxWithBuyModel.deleteProduct(item);
+                console.log('Сработала функция в экземпляре карточки CardBasket events');
             },
         });
-        return cardBasket.render(item);
+        return cardBasket.render({title: item.title, price: item.price, basketCardIndex: itemCount});
     });
-    basketView.render({list: cardsBasket, prise:boxWithBuyModel.costSelectedProducts()});
-    //console.log(boxWithBuyModel.selectedProducts)  
-})  
 
+    basketView.render({ list: basketCards, prise: boxWithBuyModel.costSelectedProducts()}) 
+    //
+    console.log(`Товары в корзине`);
+    console.log(boxWithBuyModel.selectedProducts);
+});
+
+
+/*
+// Событие закрытие модального окна при клике за пределами --
+document.addEventListener('click', (event) => {
+//    const withinBoundaries = event.composedPath().includes(modalView.content);
+//   if (!withinBoundaries) {
+//        modalView.close();
+//        console.log('1')
+//   //};
+//    };
+
+    if (!modal.contains(event.target)) {
+        // Закрываем модальное окно
+        modalView.close();
+        console.log('2')
+    } else {
+        // Закрываем модальное окно
+        console.log('1')
+    }
+});
 */
+/*
+// Событие очистка данных покупателя
+events.on('buyer:clean', () => { 
+    FormOrder.render({});
+    FormContacts.render({});   
+    console.log('Данные покупателя сброшены');
+});
+*/
+
+
+
+
 /*
 .allProduct
 .selectedProduct

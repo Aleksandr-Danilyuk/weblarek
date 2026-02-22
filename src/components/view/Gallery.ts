@@ -28,6 +28,6 @@ export class Gallery extends Component<IGallery> {
     set catalog(value: HTMLElement[]) {
         //this.galleryElement.replaceChildren(...value);
         this.container.replaceChildren(...value);
-        this.events.emit('gallery:change')
+        this.events.emit('gallery:change');
     }
 }

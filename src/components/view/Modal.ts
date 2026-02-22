@@ -27,8 +27,8 @@ export class Modal extends Component<IModal> {
         this.modalContent = ensureElement<HTMLElement>('.modal__content', this.container);
         
         this.modalCloseButton.addEventListener('click', () => {
-            this.events.emit('modal:close');
             this.container.classList.toggle('modal_active');
+            this.events.emit('modal:close');
         });
     }
 
@@ -40,5 +40,13 @@ export class Modal extends Component<IModal> {
         this.events.emit('modal:changed');
 
     }
+
+    close() {
+        this.container.classList.remove('modal_active');
+    };
+
+    show() {
+        this.container.classList.add('modal_active');
+    };
 }
 

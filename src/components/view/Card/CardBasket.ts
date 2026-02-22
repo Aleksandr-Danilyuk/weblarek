@@ -38,6 +38,7 @@ export class CardBasket extends Card<ICardBasket>  {
 
         if (actions?.onClick) {
             this.ButtonDeleteCard.addEventListener('click', actions.onClick);
+            this.events.emit('cardBasket:click_delete');
         };
     }
 

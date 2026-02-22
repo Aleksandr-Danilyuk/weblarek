@@ -1,6 +1,7 @@
 import {Form} from '../view/Form';
 import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
+import { IBuyer, TPayment} from '../../types';
 //import {GalleryData} from "../../types";
 
 // Шаблон для работы с инпут
@@ -19,8 +20,11 @@ import {ensureElement} from '../../utils/utils';
 //          onClick: (event) => {console.log('Card selected');}
 //      });
 
+//payment(data: TPayment
+type IFormOrder = Pick<IBuyer, 'payment' | 'address'> 
 
-export class FormOrder extends Form {
+
+export class FormOrder extends Form<IFormOrder> {
     protected addressFormInput: HTMLInputElement;
     protected cardFormButton: HTMLButtonElement;
     protected cashFormButton: HTMLButtonElement;
@@ -46,6 +50,25 @@ export class FormOrder extends Form {
             this.events.emit('formOrder:next');
         });
 
+    }
+
+    set payment(value: TPayment) {
+        switch (value) {
+            case 'card': {
+                this.cardFormButton.setAttribute('button_alt-active'); 
+                break;};
+            case 'cash': {
+                this.cashFormButton.setAttribute('button_alt-active'); 
+                break;};
+            default: {
+                this.cardFormButton.removeAttribute('button_alt-active'); 
+                this.cashFormButton.removeAttribute('button_alt-active'); 
+                break;};
+        };
+    }
+
+    set address(value: string) {
+        this.addressFormInput.value = value;
     }
 
 }
