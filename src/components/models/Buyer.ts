@@ -46,7 +46,7 @@ export class Buyer implements IBuyer {
     set email(valueEmail: string) {
         this._email = valueEmail;
         //this.events.emit('buyer_email:changed');
-        this.events.emit('form_order:changed');
+        this.events.emit('form_contacts:changed');
     }
     
     // получает электронный адрес покупателя
@@ -58,7 +58,7 @@ export class Buyer implements IBuyer {
     set phone(valuePhone: string) {
         this._phone = valuePhone;
         //this.events.emit('buyer_phone:changed');
-        this.events.emit('form_order:changed');
+        this.events.emit('form_contacts:changed');
     }
 
     // получает выбранный покупателем способ оплаты заказа
@@ -83,7 +83,7 @@ export class Buyer implements IBuyer {
         this.email = '';
         this.phone = '';
         //this.events.emit('buyer:clean');
-        this.events.emit('form_order:changed');
+        this.events.emit('form_contacts:changed');
     }
 
     // метод реализующий валидацию способа оплаты заказа

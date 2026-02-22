@@ -13,6 +13,8 @@ import {ensureElement} from './utils/utils';
 
 import {API_URL} from './utils/constants';
 import {CDN_URL} from './utils/constants';
+import {IOrderRequest, IBuyer} from './types/index';
+
 
 // 9 спринт import Header
 import {Header} from './components/view/Header';
@@ -37,29 +39,31 @@ const actions = {
     'product:add': 'Товар добавлен в корзину',
     'order_success:close': 'Событие в модалоьном окне успешного заказа - не назначено',
     'basket:change': 'Слой данных корзины изменён',
-    'form_order:changed': 'изменение данных покупателя',
     'form_order:clean': 'обнуление данных покупателя',
     'form:complete': 'Нажата кнопка оформления заказа',
     'cardBasket:click_delete': 'Нажатие удаления карточки из корзины',
     'cardPreview:click': 'Пока не назначено',
     'card:click': 'Событие нажатие кнопки карточки в Галереи View',
     'basket:order': 'Событие нажатие кнопки оформления заказа в Корзине View',
+    'form_order:changed': 'Изменение данных заказа первой формы',
     'form_order:card': 'Выбран способ оплаты card на форме FormOrder form_order:card',
     'form_order:cash': 'Выбран способ оплаты cash на форме FormOrder form_order:cash',
     'form_order:address': 'Указан адрес доставки на форме FormOrder form_order:address',
     'form_order:next': 'Нажата кнопка перехода ко второй форме оформления заказа',
-    'form_order:email': 'Указан адрес электронной почты на форме FormOrder form_order:email',
-    'form_order:phone': 'Указан телефонный номер покупателя на форме FormOrder form_order:phone'
+    'form_contacts:changed': 'Изменение данных покупателя второй формы',
+    'form_contacts:complete': 'Нажата кнопка завершения оформления заказа во второй форме',
+    'form_contacts:email': 'Указан адрес электронной почты на форме FormContacts form_contacts:email',
+    'form_contacts:phone': 'Указан телефонный номер покупателя на форме FormContacts form_contacts:phone'
 };
 
 const HeaderHTML = document.querySelector('.header') as HTMLElement;
 const galleryHTML = document.querySelector('.gallery') as HTMLElement;
 const modalHTML = ensureElement<HTMLElement>('#modal-container');
 const cardPreviewlHTML = cloneTemplate('#card-preview');
-const orderSuccessHTML = cloneTemplate('#success');
 const basketHTML = cloneTemplate('#basket');
 const formOrderHTML =  cloneTemplate('#order') as HTMLFormElement;
-const formContactsHTML = cloneTemplate('#contacts') as HTMLFormElement;;
+const formContactsHTML = cloneTemplate('#contacts') as HTMLFormElement;
+const orderSuccessHTML = cloneTemplate('#success');
 
 // Создание экземпляров Base
 const events = new EventEmitter;
@@ -266,22 +270,75 @@ events.on('form_order:changed', () => {
 
 events.on('form_order:next', () => {    // Нажата кнопка перехода ко второй форме оформления заказа FormOrder form_order:next
     console.log('Нажата кнопка перехода ко второй форме оформления заказа FormOrder form_order:next');
+    modalView.content = formContactsHTML;
     formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
-    modalView.content = formContactsHTML; 
 }); 
 
 
 // ===================================================================
 
-events.on('form_order:email', (data:{email:string}) => {    // Введён адрес электронной почты на форме FormOrder form_order:email
-    console.log('Введён адрес электронной почты на форме FormOrder form_order:email');
-    console.log(data.email);
-    buyerModel.address = data.email;
+events.on('form_contacts:email', (data:{email:string}) => {    // Введён адрес электронной почты на форме FormContacts form_contacts:email
+    console.log('Введён адрес электронной почты на форме FormContacts form_contacts:email');
+    console.log(buyerModel.email);
+    buyerModel.email = data.email;
+    console.log(buyerModel.email);
 }); 
 
-events.on('form_order:phone', (data:{phone:string}) => {    // Введён телефонный номер покупателя на форме FormOrder form_order:phone
-    console.log('Введён телефонный номер покупателя на форме FormOrder form_order:phone');
-    console.log(data.phone);
-    buyerModel.address = data.phone;
+events.on('form_contacts:phone', (data:{phone:string}) => {    // Введён телефонный номер покупателя на форме FormContacts form_contacts:phone
+    console.log('Введён телефонный номер покупателя на форме FormContacts form_contacts:phone');
+    console.log(buyerModel.phone);
+    buyerModel.phone = data.phone;
+    console.log(buyerModel.phone);
 }); 
+
+events.on('form_contacts:changed', () => { 
+    console.log('Изменились данные заказа на форме FormContacts form_contacts:changed');
+
+    const falseEmailValid = buyerModel.validEmail();     // Валидация второй формы заказа 
+    const falsePhoneValid = buyerModel.validPhone();
+    if (!falseEmailValid && !falsePhoneValid) {
+        formContactsView.validationError = '';
+        formContactsView.activateButton(false);
+    } else if (!falseEmailValid) {
+        formContactsView.validationError = buyerModel.validPhone();
+        formContactsView.activateButton(true);
+    } else if (!falsePhoneValid) {
+        formContactsView.validationError = buyerModel.validEmail();
+        formContactsView.activateButton(true);
+    } else {
+        formContactsView.validationError = `${buyerModel.validEmail()} , ${buyerModel.validPhone()}`;
+        formContactsView.activateButton(true);
+    };
+
+    formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
+}); 
+
+events.on('form_contacts:complete', () => {    // Нажата кнопка завершения оформления заказа во второй форме
+    console.log('Нажата кнопка завершения оформления заказа во второй форме FormContacts form_contacts:complete');
+    const sendOderRequest = new CommunicationLayer(urlApi);
+    const request = sendOderRequest.postBuy({
+        items: boxWithBuyModel.selectedProducts.map((item) => item.id),
+        total: boxWithBuyModel.costSelectedProducts(),
+        payment: buyerModel.payment,
+        address: buyerModel.address,
+        email: buyerModel.email,
+        phone: buyerModel.phone
+    });
+
+    console.log(request);
+    console.log(boxWithBuyModel.selectedProducts); 
+    console.log(sendOderRequest);
+
+    if (sendOderRequest) {
+        orderSuccessView.render({description: boxWithBuyModel.costSelectedProducts()});
+        modalView.content = orderSuccessHTML; 
+    }
+});
+
+events.on('order_success:close', () => {
+    buyerModel.clearDataBuyer();
+    boxWithBuyModel.cleanSelectedProducts();
+    headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
+    modalView.close();
+});
 

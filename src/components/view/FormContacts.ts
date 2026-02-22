@@ -33,23 +33,30 @@ export class FormContacts extends Form<IFormContacts> {
         this.emailFormInput = ensureElement<HTMLInputElement>('input[name="email"]', this.container);
         this.phoneFormInput = ensureElement<HTMLInputElement>('input[name="phone"]', this.container);
         this.orderButtonSubmit = ensureElement<HTMLButtonElement>('.button', this.container);
-        //this.orderButtonSubmit = this.container.querySelector('.button') as HTMLButtonElement;
 
         this.emailFormInput.addEventListener('input', () => {
-            this.events.emit('form_order:email', {email: this.emailFormInput.value});
+            this.events.emit('form_contacts:email', {email: this.emailFormInput.value});
         });
 
         this.phoneFormInput.addEventListener('input', () => {
-            this.events.emit('form_order:phone', {phone: this.orderButtonSubmit.value});
+            this.events.emit('form_contacts:phone', {phone: this.phoneFormInput.value});
         });
 
-        this.orderButtonSubmit.addEventListener('click', () => {
-            this.events.emit('form_order:next');
+        this.orderButtonSubmit.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.events.emit('form_contacts:complete');
         });
     }
 
-    enabledButton(){
-        this.orderButtonSubmit.disabled = false;
+    set email(value: string) {
+        this.emailFormInput.value = value;
     }
 
+    set phone(value: string) {
+        this.phoneFormInput.value = value;
+    }
+
+    activateButton(data: boolean){
+        this.orderButtonSubmit.disabled = data;
+    }
 }

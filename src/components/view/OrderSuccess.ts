@@ -47,9 +47,4 @@ export class OrderSuccess extends Component<IOrderSuccess>  {
         const message = `Списано ${value} синапсов`;
         this.orderSuccessDescription.textContent = message;
     }
-
-   // set description(value: number = 0) {
-    //    const cost = String(value);
-    //    this.orderSuccessDescription.textContent = `Списано ${cost} синапсов`;
-   // }
 }

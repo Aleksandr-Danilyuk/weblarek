@@ -83,14 +83,6 @@ export class FormOrder extends Form<IFormOrder> {
         this.addressFormInput.value = value;
     }
 
-    // enabledButton(){
-    //     this.orderButtonNext.disabled = false;
-    // }
-
-    // disabledButton(){
-    //     this.orderButtonNext.disabled = true;
-    // }
-
     activateButton(data: boolean){
         this.orderButtonNext.disabled = data;
     }
