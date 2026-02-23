@@ -318,3 +318,21 @@ Presenter - презентер содержит основную логику п
 
 ### Слой Управления (Presenter)
 Реализует логику работы в файле main.ts
+
+Используются события:
+    {'basket:click': 'событие нажатие копки корзины',
+    'catalog:changed' : 'Слой данных Каталог изменён',
+    'card:select' : 'Сохранение товара для подробного отображения card:select Класс ProductsCatalog' ,
+    'order_success:close': 'Событие в модалоьном окне успешного заказа',
+    'basket:change': 'Слой данных корзины изменён',
+    'card:click': 'Событие нажатие кнопки карточки в Галереи View',
+    'basket:order': 'Событие нажатие кнопки оформления заказа в Корзине View, Работа Презентера с первой формой заказа',
+    'form_order:changed': 'Изменились данные заказа на форме FormOrder form_order:changed',
+    'form_order:card': 'Выбран способ оплаты card на форме FormOrder form_order:card',
+    'form_order:cash': 'Выбран способ оплаты cash на форме FormOrder form_order:cash',
+    'form_order:address': 'Указан адрес доставки на форме FormOrder form_order:address',
+    'form_order:next': 'Нажата кнопка перехода ко второй форме оформления заказа FormOrder form_order:next',
+    'form_contacts:changed': 'Изменились данные заказа на форме FormContacts form_contacts:changed',
+    'form_contacts:complete': 'Нажата кнопка завершения оформления заказа во второй форме FormContacts form_contacts:complete',
+    'form_contacts:email': 'Введён адрес электронной почты на форме FormContacts form_contacts:email',
+    'form_contacts:phone': 'Введён телефонный номер покупателя на форме FormContacts form_contacts:phone'}

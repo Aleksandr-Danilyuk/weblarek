@@ -1,15 +1,6 @@
 import {Component} from '../base/Component';
 import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
-//import {GalleryData} from "../../types";
-
-// Шаблон для работы с инпут
-//const inputElement = document.getElementById('inputId') as HTMLInputElement;
-//const value = inputElement.value;
-//console.log(value);
-//  // inputElement.addEventListener('input', (event: Event) => {
-    //   const inputValue = (event.target as HTMLInputElement).value;
-    //   console.log('Input value:', inputValue);}
 
 interface IHeader {  
   counter: number; 
@@ -29,10 +20,9 @@ export class Header extends Component<IHeader> {
         this.basketButton.addEventListener('click', () => {
             this.events.emit('basket:click');
         });
-    }
+    };
 
-    // Инструментарий для работы с DOM в дочерних компонентах
     set counter(value: number) {
         this.counterElement.textContent = String(value);
-    }
-}
+    };
+};

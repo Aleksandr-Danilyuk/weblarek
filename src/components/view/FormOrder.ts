@@ -2,27 +2,8 @@ import {Form} from '../view/Form';
 import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
 import { IBuyer, TPayment} from '../../types';
-//import {GalleryData} from "../../types";
 
-// Шаблон для работы с инпут
-//const inputElement = document.getElementById('inputId') as HTMLInputElement;
-//const value = inputElement.value;
-//console.log(value);
-//  // inputElement.addEventListener('input', (event: Event) => {
-    //   const inputValue = (event.target as HTMLInputElement).value;
-    //   console.log('Input value:', inputValue);}
-
-
-// Пример определения ICardActions с функцией
-//type ICardActions = { onClick: (event: PointerEvent) => void };
-// При создании экземпляра CardCatalog передайте функцию:
-//      const cardCatalog = new CardCatalog(container, {
-//          onClick: (event) => {console.log('Card selected');}
-//      });
-
-//payment(data: TPayment
-type IFormOrder = Pick<IBuyer, 'payment' | 'address'> 
-
+type IFormOrder = Pick<IBuyer, 'payment' | 'address'>;
 
 export class FormOrder extends Form<IFormOrder> {
     protected addressFormInput: HTMLInputElement;
@@ -45,7 +26,7 @@ export class FormOrder extends Form<IFormOrder> {
         this.cardFormButton.addEventListener('click', (event) => {
             event.preventDefault();
             this.events.emit('form_order:card', {payment: 'card'});
-        })
+        });
 
         this.cashFormButton.addEventListener('click', (event) => {
             event.preventDefault();
@@ -54,12 +35,9 @@ export class FormOrder extends Form<IFormOrder> {
 
         this.orderButtonNext.addEventListener('click', (event) => {
             event.preventDefault();
-            this.events.emit('form_order:next');
-            console.log('Кнопка перехода ко второй форме нажата');
+            this.events.emit('form_order:next');  // Кнопка перехода ко второй форме нажата
         });
-
-    }
-
+    };
 
     set payment(value: TPayment) {
         switch (value) {
@@ -76,14 +54,13 @@ export class FormOrder extends Form<IFormOrder> {
                 this.cashFormButton.classList.remove('button_alt-active'); 
                 break;};
         };
-    }
-
+    };
 
     set address(value: string) {
         this.addressFormInput.value = value;
-    }
+    };
 
     activateButton(data: boolean){
         this.orderButtonNext.disabled = data;
-    }
-}
+    };
+};

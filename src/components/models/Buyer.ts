@@ -33,7 +33,6 @@ export class Buyer implements IBuyer {
     // сохраняет адрес доставки товара
     set address(valueAddress: string) {
         this._address = valueAddress;
-        //this.events.emit('buyer_address:changed');
         this.events.emit('form_order:changed');
     }
 
@@ -45,7 +44,6 @@ export class Buyer implements IBuyer {
     // сохраняет электронный адрес покупателя
     set email(valueEmail: string) {
         this._email = valueEmail;
-        //this.events.emit('buyer_email:changed');
         this.events.emit('form_contacts:changed');
     }
     
@@ -57,7 +55,6 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа
     set phone(valuePhone: string) {
         this._phone = valuePhone;
-        //this.events.emit('buyer_phone:changed');
         this.events.emit('form_contacts:changed');
     }
 
@@ -82,7 +79,6 @@ export class Buyer implements IBuyer {
         this.address = '';
         this.email = '';
         this.phone = '';
-        //this.events.emit('buyer:clean');
         this.events.emit('form_contacts:changed');
     }
 
@@ -103,6 +99,6 @@ export class Buyer implements IBuyer {
 
     // метод реализующий телефонного номера покупателя
     validPhone(): string {
-        return this.email === '' ? 'Укажите номер телефона' : '';
+        return this.phone === '' ? 'Укажите номер телефона' : '';
     }
 }

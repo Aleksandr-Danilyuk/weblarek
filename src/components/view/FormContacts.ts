@@ -2,25 +2,9 @@ import {Form} from '../view/Form';
 import {IEvents} from '../base/Events';
 import {ensureElement} from '../../utils/utils';
 import { IBuyer } from '../../types';
-//import {GalleryData} from "../../types";
-
-// Шаблон для работы с инпут
-//const inputElement = document.getElementById('inputId') as HTMLInputElement;
-//const value = inputElement.value;
-//console.log(value);
-//  // inputElement.addEventListener('input', (event: Event) => {
-    //   const inputValue = (event.target as HTMLInputElement).value;
-    //   console.log('Input value:', inputValue);}
 
 
-// Пример определения ICardActions с функцией
-//type ICardActions = { onClick: (event: PointerEvent) => void };
-// При создании экземпляра CardCatalog передайте функцию:
-//      const cardCatalog = new CardCatalog(container, {
-//          onClick: (event) => {console.log('Card selected');}
-//      });
-
-type IFormContacts = Pick<IBuyer, 'email' | 'phone'> 
+type IFormContacts = Pick<IBuyer, 'email' | 'phone'>;
 
 export class FormContacts extends Form<IFormContacts> {
     protected emailFormInput: HTMLInputElement;
@@ -46,17 +30,17 @@ export class FormContacts extends Form<IFormContacts> {
             event.preventDefault();
             this.events.emit('form_contacts:complete');
         });
-    }
+    };
 
     set email(value: string) {
         this.emailFormInput.value = value;
-    }
+    };
 
     set phone(value: string) {
         this.phoneFormInput.value = value;
-    }
+    };
 
     activateButton(data: boolean){
         this.orderButtonSubmit.disabled = data;
-    }
-}
+    };
+};

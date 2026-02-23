@@ -8,34 +8,33 @@ export class ProductsCatalog {
 
     constructor(protected events:IEvents) {
         this.allProduct = [];
-    }
+    };
     
     // Методы класса:   
     // сохранение массива товаров полученного в параметрах метода;
     public set allProduct (arrayProduct: IProduct[]) {
         this._allProduct = arrayProduct;
         this.events.emit('catalog:changed');
-        console.log('Сохранение массива товаров set allProduct Класс ProductsCatalog');
-    }
+    };
     
     // получение массива товаров из модели;
     get allProduct(): IProduct[] {
         return this._allProduct;
-    }
+    };
     
     // сохранение товара для подробного отображения;
     set selectedProduct(product: IProduct) {
         this._selectedProduct = product;
         this.events.emit('card:select');
-    }
+    };
 
     // получение товара для подробного отображения
     get selectedProduct(): IProduct | null {
         return this._selectedProduct;
-    }
+    };
 
     // получение одного товара по его id;
     getProduct(idProduct: string): IProduct | undefined { 
         return this.allProduct.find(product => product.id === idProduct);
-    }
-}
+    };
+};
