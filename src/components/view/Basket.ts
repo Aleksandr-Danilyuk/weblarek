@@ -5,6 +5,7 @@ import {IEvents} from '../base/Events';
 interface IBasket {  
   list: HTMLElement[];
   prise: number;
+  buttonState?: boolean;
 };  
 
 export class Basket extends Component<IBasket>  {
@@ -33,11 +34,15 @@ export class Basket extends Component<IBasket>  {
         this.basketPrise.textContent = `${value} синапсов`;
     };
 
-    disabledButton(){
-        this.basketButton.disabled = true;
-    };
+    // disabledButton(){
+    //     this.basketButton.disabled = true;
+    // };
 
-    enabledButton(){
-        this.basketButton.disabled = false;
+    // enabledButton(){
+    //     this.basketButton.disabled = false;
+    // };
+
+    set buttonState(value: boolean) {
+        this.basketButton.disabled = value;
     };
 };

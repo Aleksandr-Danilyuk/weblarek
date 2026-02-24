@@ -9,15 +9,15 @@ export class FormOrder extends Form<IFormOrder> {
     protected addressFormInput: HTMLInputElement;
     protected cardFormButton: HTMLButtonElement;
     protected cashFormButton: HTMLButtonElement;
-    protected orderButtonNext: HTMLButtonElement;
+    //protected orderButtonNext: HTMLButtonElement;
 
     constructor(protected events:IEvents, container: HTMLFormElement) {
-        super(container);
+        super(events, container);
 
         this.addressFormInput = ensureElement<HTMLInputElement>('input[name="address"]', this.container);
         this.cardFormButton = ensureElement<HTMLButtonElement>('button[name="card"]', this.container);
         this.cashFormButton = ensureElement<HTMLButtonElement>('button[name="cash"]', this.container);
-        this.orderButtonNext = ensureElement<HTMLButtonElement>('.order__button', this.container);
+        //this.orderButtonNext = ensureElement<HTMLButtonElement>('.order__button', this.container);
 
         this.addressFormInput.addEventListener('input', () => {
             this.events.emit('form_order:address', {address: this.addressFormInput.value});
@@ -33,10 +33,10 @@ export class FormOrder extends Form<IFormOrder> {
             this.events.emit('form_order:cash', {payment: 'cash'});
         });
 
-        this.orderButtonNext.addEventListener('click', (event) => {
-            event.preventDefault();
-            this.events.emit('form_order:next');  // Кнопка перехода ко второй форме нажата
-        });
+        // this.orderButtonNext.addEventListener('click', (event) => {
+        //     event.preventDefault();
+        //     this.events.emit('form_order:next');  // Кнопка перехода ко второй форме нажата
+        // });
     };
 
     set payment(value: TPayment) {
@@ -60,7 +60,10 @@ export class FormOrder extends Form<IFormOrder> {
         this.addressFormInput.value = value;
     };
 
-    activateButton(data: boolean){
-        this.orderButtonNext.disabled = data;
-    };
+    // activateButton(data: boolean){
+    //     this.orderButtonNext.disabled = data;
+    // };
+    // set buttonState(value: boolean) {
+    //     this.orderButtonNext.disabled = value;
+    // }
 };

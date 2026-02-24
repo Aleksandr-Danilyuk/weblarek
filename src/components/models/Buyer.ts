@@ -21,8 +21,8 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа.
     set payment(valuePayment: TPayment) {
         this._payment = valuePayment;
-        //this.events.emit('buyer_payment:changed');
-        this.events.emit('form_order:changed');
+        this.events.emit('buyer_order:changed');
+        //this.events.emit('form_order:changed');
     }
 
     //  получает выбранный покупателем способ оплаты заказа
@@ -33,7 +33,8 @@ export class Buyer implements IBuyer {
     // сохраняет адрес доставки товара
     set address(valueAddress: string) {
         this._address = valueAddress;
-        this.events.emit('form_order:changed');
+        this.events.emit('buyer_order:changed');
+        //this.events.emit('form_order:changed');
     }
 
     // получает адрес доставки товара
@@ -44,7 +45,8 @@ export class Buyer implements IBuyer {
     // сохраняет электронный адрес покупателя
     set email(valueEmail: string) {
         this._email = valueEmail;
-        this.events.emit('form_contacts:changed');
+        this.events.emit('buyer_contacts:changed');
+        //this.events.emit('form_contacts:changed');
     }
     
     // получает электронный адрес покупателя
@@ -55,7 +57,8 @@ export class Buyer implements IBuyer {
     // сохраняет выбранный покупателем способ оплаты заказа
     set phone(valuePhone: string) {
         this._phone = valuePhone;
-        this.events.emit('form_contacts:changed');
+        this.events.emit('buyer_contacts:changed');
+        //this.events.emit('form_contacts:changed');
     }
 
     // получает выбранный покупателем способ оплаты заказа
@@ -64,14 +67,14 @@ export class Buyer implements IBuyer {
     }
 
     // метод реализующий получение всех данных покупателя
-    getDataBuyer(): IBuyer {
-        return {
-            payment : this.payment,
-            address : this.address,
-            email : this.email,
-            phone : this.phone
-        }
-    }
+    // getDataBuyer(): IBuyer {
+    //     return {
+    //         payment : this.payment,
+    //         address : this.address,
+    //         email : this.email,
+    //         phone : this.phone
+    //     }
+    // }
 
     // метод реализующий очистку данных покупателя
     clearDataBuyer() {
@@ -79,7 +82,9 @@ export class Buyer implements IBuyer {
         this.address = '';
         this.email = '';
         this.phone = '';
-        this.events.emit('form_contacts:changed');
+        this.events.emit('buyer_order:changed');
+        this.events.emit('buyer_contacts:changed');
+        //this.events.emit('form_contacts:changed');
     }
 
     // метод реализующий валидацию способа оплаты заказа

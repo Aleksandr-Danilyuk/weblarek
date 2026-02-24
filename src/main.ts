@@ -20,7 +20,7 @@ import {CardCatalog} from './components/view/Card/CardCatalog';
 import {CardPreview} from './components/view/Card/CardPreview';
 import {CardBasket} from './components/view/Card/CardBasket';
 import {cloneTemplate} from './utils/utils';
-import {OrderSuccess} from './components/view/orderSuccess';
+import {OrderSuccess} from './components/view/OrderSuccess';
 import {Basket} from './components/view/Basket';
 
 const HeaderHTML = document.querySelector('.header') as HTMLElement;
@@ -113,9 +113,9 @@ events.on('card:click', () => {    // Событие нажатия Карточ
 
 events.on('card:select', () => {    // Сохранение товара для подробного отображения card:select Класс ProductsCatalog
     if (productsModel.selectedProduct?.price === null) {
-        modalCardPreview.disabledButton();
+        modalCardPreview.buttonState = true;
     } else {
-        modalCardPreview.enabledButton();
+        modalCardPreview.buttonState = false;
     };
     if (!boxWithBuyModel.checkProduct(productsModel.selectedProduct!.id)) {
         modalCardPreview.textCardButton = 'Купить';     // Отрисовываем кнопку Купить
@@ -133,10 +133,10 @@ events.on('card:select', () => {    // Сохранение товара для 
 // Событие открытия корзины headerView слоя View 
 events.on('basket:click', () => {    // Событие нажатия на кнопку корзины в шапке
     if (boxWithBuyModel.numberSelectedProducts() < 1){
-        basketView.disabledButton();
-    } else (
-        basketView.enabledButton()
-    );
+        basketView.buttonState = true;
+    } else {
+        basketView.buttonState = false
+    };
     modalView.content = basketHTML; 
     modalView.show();
 });  
@@ -153,7 +153,7 @@ events.on('basket:changed', () => {
             onClick: () => {
                 boxWithBuyModel.deleteProduct(item);
                 if (boxWithBuyModel.numberSelectedProducts() < 1){
-                    basketView.disabledButton();
+                    basketView.buttonState = true;
                 };
             },
         });
@@ -182,27 +182,27 @@ events.on('form_order:address', (data:{address:string}) => {    // Указан 
     buyerModel.address = data.address;
 }); 
 
-events.on('form_order:changed', () => {   // Изменились данные заказа на форме FormOrder form_order:changed
+events.on('buyer_order:changed', () => {   // Изменились данные покупателя по заказу
     const falsePaymentValid = buyerModel.validPayment();     // Валидация первой формы заказа 
     const falseAddressValid = buyerModel.validAddress();
     if (!falsePaymentValid && !falseAddressValid) {
         formOrderView.validationError = '';
-        formOrderView.activateButton(false);
+        formOrderView.buttonState = false;
     } else if (!falsePaymentValid) {
         formOrderView.validationError = buyerModel.validAddress();
-        formOrderView.activateButton(true);
+        formOrderView.buttonState = true;
     } else if (!falseAddressValid) {
         formOrderView.validationError = buyerModel.validPayment();
-        formOrderView.activateButton(true);
+        formOrderView.buttonState = true;
     } else {
         formOrderView.validationError = `${buyerModel.validPayment()} , ${buyerModel.validAddress()}`;
-        formOrderView.activateButton(true);
+        formOrderView.buttonState = true;
     }
 
     formOrderView.render({payment: buyerModel.payment, address: buyerModel.address});
 }); 
 
-events.on('form_order:next', () => {    // Нажата кнопка перехода ко второй форме оформления заказа FormOrder form_order:next
+events.on('order:submit', () => {    // Нажата кнопка перехода ко второй форме оформления заказа FormOrder
     modalView.content = formContactsHTML;
     formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
 }); 
@@ -215,26 +215,26 @@ events.on('form_contacts:phone', (data:{phone:string}) => {    // Введён �
     buyerModel.phone = data.phone;
 }); 
 
-events.on('form_contacts:changed', () => {      // Изменились данные заказа на форме FormContacts form_contacts:changed
+events.on('buyer_contacts:changed', () => {      // Изменились контактные данные покупателя
     const falseEmailValid = buyerModel.validEmail();     // Валидация второй формы заказа 
     const falsePhoneValid = buyerModel.validPhone();
     if (!falseEmailValid && !falsePhoneValid) {
         formContactsView.validationError = '';
-        formContactsView.activateButton(false);
+        formContactsView.buttonState = false;
     } else if (!falseEmailValid) { 
         formContactsView.validationError = buyerModel.validPhone();
-        formContactsView.activateButton(true); 
+        formContactsView.buttonState = true; 
     } else if (!falsePhoneValid) {
         formContactsView.validationError = buyerModel.validEmail();
-        formContactsView.activateButton(true);
+        formContactsView.buttonState = true;
     } else {
         formContactsView.validationError = `${buyerModel.validEmail()} , ${buyerModel.validPhone()}`;
-        formContactsView.activateButton(true);
+        formContactsView.buttonState = true;
     };
     formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
 }); 
 
-events.on('form_contacts:complete', () => {    // Нажата кнопка завершения оформления заказа во второй форме FormContacts form_contacts:complete
+events.on('contacts:submit', () => {    // Нажата кнопка завершения оформления заказа во второй форме FormContacts
     const sendOderRequest = new CommunicationLayer(urlApi);
     const request = sendOderRequest.postBuy({
         items: boxWithBuyModel.selectedProducts.map((item) => item.id),

@@ -31,8 +31,9 @@ export class BoxWithBuy {
 
     // очистка корзины
     cleanSelectedProducts() {
-        this._selectedProducts = this._selectedProducts.splice(0);
-        this.selectedProducts.map((items) => {this.deleteProduct(items)});
+        //this._selectedProducts = this._selectedProducts.splice(0);
+        //.selectedProducts.map((items) => {this.deleteProduct(items)});
+        this._selectedProducts = [];
         this.events.emit('basket:changed');
     }
 
