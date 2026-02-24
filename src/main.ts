@@ -3,6 +3,7 @@ import './scss/styles.scss';
 import {ProductsCatalog} from './components/models/ProductCatalog';
 import {Buyer} from './components/models/Buyer';
 import {TPayment} from './types/index';
+import {IProduct} from './types/index';
 import {BoxWithBuy} from './components/models/BoxWithBuy';
 import {CommunicationLayer} from './components/communication/CommunicationLayer';
 import {Api} from './components/base/Api';
@@ -69,24 +70,25 @@ dataCommunicationLayer.getProduct().then(products => {
 });
 
 // Обработка событий
-// Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
-document.addEventListener('click', (event) => {
-    if (event.target === modalHTML) {
-        modalHTML.classList.remove('modal_active'); 
-    };
-});
+// // Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
+// document.addEventListener('click', (event) => {
+//     if (event.target === modalHTML) {
+//         modalHTML.classList.remove('modal_active'); 
+//     };
+// });
 
 
 // Событие изменение Галереи товарами 
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');
-        const card = new CardCatalog(events, CardCatalogTemplate, { 
-            onClick: () => {
-                events.emit('card:click');
-                productsModel.selectedProduct = item; // Присваиваем значение Выбранной карточки в модель данных
-            },
-        });
+        const card = new CardCatalog(events, CardCatalogTemplate, item);
+        // const card = new CardCatalog(events, CardCatalogTemplate, { 
+        //     onClick: () => {
+        //         events.emit('card:click', {item});
+        //         //productsModel.selectedProduct = item; 
+        //     },
+        // });
         return card.render(item);
     });
 
@@ -106,7 +108,8 @@ const modalCardPreview = new CardPreview(events, cardPreviewlHTML, {
     }
 });
 
-events.on('card:click', () => {    // Событие нажатия Карточки в Галерее
+events.on('card:click', (data:{item:IProduct}) => {    // Событие нажатия Карточки в Галерее
+    productsModel.selectedProduct = data.item; // Присваиваем значение Выбранной карточки в модель данных
     modalView.content = cardPreviewlHTML;
     modalView.show();
 });  

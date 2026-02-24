@@ -20,6 +20,13 @@ export class Modal extends Component<IModal> {
         this.modalCloseButton.addEventListener('click', () => {
             this.container.classList.toggle('modal_active');
         });
+
+        // Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
+        document.addEventListener('click', (event) => {
+            if (event.target === this.container) {
+                this.container.classList.remove('modal_active'); 
+            };
+        });
     };
 
     set content(value: HTMLElement) {
