@@ -23,11 +23,13 @@ export class Basket extends Component<IBasket>  {
         this.basketButton.addEventListener('click', () => {
             this.events.emit('basket:order');
         });
+
+        this.basketButton.disabled = true;
     };
 
     set list(value: HTMLElement[]) {
         this.basketList.replaceChildren(...value);
-        this.events.emit('basket:change');
+        //this.events.emit('basket:change');
     };
 
     set prise(value: number) {

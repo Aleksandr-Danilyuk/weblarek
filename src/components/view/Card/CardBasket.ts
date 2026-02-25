@@ -1,29 +1,34 @@
 import {Card} from './Card';
 import {ensureElement} from '../../../utils/utils';
 import {IEvents} from '../../base/Events';
+import {IProduct} from '../../../types';
 
-type ICardBasketActions = { onClick: (event: PointerEvent) => void };
+// type ICardBasketActions = { onClick: (event: PointerEvent) => void };
 
 interface ICardBasket {  
   basketCardIndex: number; 
 };
 
 export class CardBasket extends Card<ICardBasket>  {
-    protected IndexCardElement: HTMLElement;
-    protected ButtonDeleteCard: HTMLButtonElement;
+    protected indexCardElement: HTMLElement;
+    protected buttonDeleteCard: HTMLButtonElement;
 
-    constructor(protected events:IEvents, container: HTMLElement, actions?: ICardBasketActions) {
+    // constructor(protected events:IEvents, container: HTMLElement, actions?: ICardBasketActions) {
+    constructor(protected events:IEvents, container: HTMLElement, item: IProduct) {
         super(container);
 
-        this.IndexCardElement = ensureElement<HTMLElement>('.basket__item-index', this.container);
-        this.ButtonDeleteCard = ensureElement<HTMLButtonElement>('.basket__item-delete', this.container);
+        this.indexCardElement = ensureElement<HTMLElement>('.basket__item-index', this.container);
+        this.buttonDeleteCard = ensureElement<HTMLButtonElement>('.basket__item-delete', this.container);
 
-        if (actions?.onClick) {
-            this.ButtonDeleteCard.addEventListener('click', actions.onClick);
-        };
+        // if (actions?.onClick) {
+        //     this.ButtonDeleteCard.addEventListener('click', actions.onClick);
+        // };
+        this.buttonDeleteCard.addEventListener('click', () => 
+            this.events.emit('card:click_delete', {item})   // Представление -> Презентеру, клик на удаление товара из корзины    
+        );
     };
 
     set basketCardIndex(value: number) {
-        this.IndexCardElement.textContent = String(value);
+        this.indexCardElement.textContent = String(value);
     };
 };
