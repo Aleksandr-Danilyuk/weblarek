@@ -35,7 +35,7 @@ export class BoxWithBuy {
     cleanSelectedProducts() {
         //this._selectedProducts = this._selectedProducts.splice(0);
         //.selectedProducts.map((items) => {this.deleteProduct(items)});
-        this._selectedProducts = [];
+        this._selectedProducts = new Array<IProduct>();
         this.events.emit('basket:clean');
         //this.events.emit('basket:changed');
     }

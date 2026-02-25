@@ -200,8 +200,10 @@ events.on('card:click_delete', (data:{item:IProduct}) => {
     boxWithBuyModel.deleteProduct(data.item);
 });
 
-events.on('basket:clean', () => {  
+events.on('basket:clean', () => {  // Модель данных событие -> Презентер слушатель -> Представление отрисовка
+    basketView.buttonState = true;
     modalCardPreview.textCardButton = 'Купить';
+    basketView.render({ list: [], prise: boxWithBuyModel.costSelectedProducts()})  
     headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
 
     // let itemCount = 0;
@@ -319,10 +321,10 @@ events.on('contacts:submit', () => {    // Нажата кнопка завер�
     handlePostBuyResponse().then((request) => {
         //console.log('Ответ then:', request?.total);
         if (request?.id) {
-            orderSuccessView.render({description: request.total});
-            modalView.content = orderSuccessView.render();
             buyerModel.clearDataBuyer();
             boxWithBuyModel.cleanSelectedProducts();
+            orderSuccessView.render({description: request.total});
+            modalView.content = orderSuccessView.render();
         };
     });
 

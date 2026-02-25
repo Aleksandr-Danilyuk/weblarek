@@ -18,7 +18,7 @@ export class OrderSuccess extends Component<IOrderSuccess>  {
 
         this.orderSuccessButtonClose.addEventListener('click', () => {
             this.events.emit('order_success:close');
-            this.container.classList.toggle('modal_active');
+            //this.container.classList.toggle('modal_active');
         });
     };
 
