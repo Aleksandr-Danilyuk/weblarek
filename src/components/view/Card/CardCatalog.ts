@@ -4,9 +4,6 @@ import {IProduct} from '../../../types';
 import {categoryMap} from '../../../utils/constants';
 import {IEvents} from '../../base/Events';
 
-// Пример определения ICardActions с функцией
-//type ICardActions = { onClick: (event: PointerEvent) => void };
-
 type CategoryKey = keyof typeof categoryMap;
 type ICardCatalog = Pick<IProduct, 'image' |  'category'>; 
 
@@ -14,22 +11,15 @@ export class CardCatalog extends Card<ICardCatalog>  {
     protected categoryElement: HTMLElement;
     protected imageElement: HTMLImageElement;
 
-    //constructor(protected events:IEvents, container: HTMLElement, item: IProduct, actions?: ICardActions) {
     constructor(protected events:IEvents, container: HTMLElement, item: IProduct) {
         super(container);
 
         this.categoryElement = ensureElement<HTMLElement>('.card__category', this.container);
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', this.container);
 
-        // if (actions?.onClick) {
-        //     this.container.addEventListener('click', actions.onClick);
-        // };
-
-        //events.emit('card:click', {item});
         this.container.addEventListener('click', () => 
             this.events.emit('card:click', {item})
         );
-
     };
 
     set category(value: string) {

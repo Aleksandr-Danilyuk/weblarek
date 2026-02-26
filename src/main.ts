@@ -56,6 +56,7 @@ const basketView = new Basket(events, basketHTML); // Создание объе�
 const formOrderView = new FormOrder(events, formOrderHTML); // Создание формы заказа слоя отображения
 const formContactsView = new FormContacts(events, formContactsHTML); // Создание формы контактных данных слоя отображения
 const orderSuccessView = new OrderSuccess(events, orderSuccessHTML); // Создание объекта Галереи слоя отображения
+const modalCardPreview = new CardPreview(events, cardPreviewlHTML); // Создание объекта Галереи слоя отображения
 
 // Заполнения объектов модели Данных
 // Получаем список товаров с сервера методом Get
@@ -71,69 +72,25 @@ dataCommunicationLayer.getProduct().then(products => {
 });
 
 // Обработка событий
-// // Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
-// document.addEventListener('click', (event) => {
-//     if (event.target === modalHTML) {
-//         modalHTML.classList.remove('modal_active'); 
-//     };
-// });
-
-
 // Событие изменение Галереи товарами 
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');
         const card = new CardCatalog(events, CardCatalogTemplate, item);
-        // const card = new CardCatalog(events, CardCatalogTemplate, { 
-        //     onClick: () => {
-        //         events.emit('card:click', {item});
-        //         //productsModel.selectedProduct = item; 
-        //     },
-        // });
         return card.render(item);
     });
 
     galleryModel.render({ catalog: itemCards });
 }); 
 
-// // Событие нажатие на кнопке  слоя View  
- // const modalCardPreview = new CardPreview(events, cardPreviewlHTML, {
-//     onClick: () => {
-//         if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
-//                 boxWithBuyModel.addProduct(productsModel.selectedProduct);  // Presenter добавляет/удаляет карточку в Корзину
-//                 modalCardPreview.textCardButton = 'Удалить из корзины';
-//         } else if (productsModel.selectedProduct) {
-//                 boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
-//                 modalCardPreview.textCardButton = 'Купить';
-//         };
-//     }
-// });
-const modalCardPreview = new CardPreview(events, cardPreviewlHTML);
-
-events.on('card:click', (data:{item:IProduct}) => {    // Событие нажатия Карточки в Галерее. Представление событие -> Презентер слушатель -> Модель данных
+// Событие нажатия Карточки в Галерее. Представление генерация события -> Презентер слушатель -> Модель данных изменение
+events.on('card:click', (data:{item:IProduct}) => {    
     productsModel.selectedProduct = data.item; // Присваиваем значение Выбранной карточки в модель данных
-    // modalView.content = cardPreviewlHTML; // Переделано управление содержимым через класс
-    // const modalCardPreview = new CardPreview(events, cardPreviewlHTML, productsModel.selectedProduct!);
 });  
 
-events.on('card:select', () => {    // Модель данных генерирует событие о изменении выбранной карточки, Презентер вызывает отрисовку выбранной карточки
-    // modalView.content = modalCardPreview.render();
-    // modalView.show();
-    //        if (boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {  // Presenter добавляет/удаляет карточку в Корзину
-    //            modalCardPreview.textCardButton = 'Удалить из корзины';
-    //     } else {
-    //            modalCardPreview.textCardButton = 'Купить';
-    //     };
-    //
-    // modalCardPreview.render({
-    //     title: productsModel.selectedProduct?.title, 
-    //     price: productsModel.selectedProduct?.price, 
-    //     description: productsModel.selectedProduct?.description, 
-    //     image: productsModel.selectedProduct?.image, 
-    //     category: productsModel.selectedProduct?.category
-    // });
-
-    modalCardPreview.render(productsModel.selectedProduct!);    // Отрисовываем Выбранную карточку card:select
+// Модель данных генерирует событие о изменении выбранной карточки, Презентер вызывает отрисовку выбранной карточки
+events.on('card:select', () => {    
+    modalCardPreview.render(productsModel.selectedProduct!);    // Отрисовываем Выбранную карточку
 
     if (productsModel.selectedProduct!.price === null) {    // Презентер проверяет полученные данные и блокирует кнопку представления при необходимости
         modalCardPreview.buttonState = true;
@@ -151,10 +108,10 @@ events.on('card:select', () => {    // Модель данных генерир�
     modalView.show();
 });  
 
-events.on('card:add', () => {    // Событие добавления карточки в корзину. Презентер -> Модель данных
-    //boxWithBuyModel.addProduct(data.item); // Присваиваем значение Выбранной карточки в модель данных
+// Событие добавления карточки в корзину
+events.on('card:add', () => {    
        if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
-                boxWithBuyModel.addProduct(productsModel.selectedProduct);  // Presenter добавляет/удаляет карточку в Корзину;
+                boxWithBuyModel.addProduct(productsModel.selectedProduct);  // Presenter добавляет/удаляет карточку в Корзину
         } else if (productsModel.selectedProduct) {
                 boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
         };
@@ -162,15 +119,11 @@ events.on('card:add', () => {    // Событие добавления карт
 
 // Событие открытия корзины headerView слоя View 
 events.on('basket:click', () => {    // Событие нажатия на кнопку корзины в шапке
-    // if (boxWithBuyModel.numberSelectedProducts() < 1){
-    //     basketView.buttonState = true;
-    // } else {
-    //     basketView.buttonState = false
-    // };
     modalView.content = basketView.render(); 
     modalView.show();
 });  
 
+// Событие данные корзины изменены
 events.on('basket:changed', (data: {product: IProduct})  => {  
     if (boxWithBuyModel.checkProduct(data.product.id)) {    // Изменение названий кнопок: проверка товара в карзине
             modalCardPreview.textCardButton = 'Удалить из корзины';
@@ -190,7 +143,8 @@ events.on('basket:changed', (data: {product: IProduct})  => {
         const cardBasketHTML = cloneTemplate<HTMLElement>('#card-basket');
         const cardBasket = new CardBasket(events, cardBasketHTML, item);
         return cardBasket.render({title: item.title, price: item.price, basketCardIndex: index + 1});
-    })
+    });
+    
     basketView.render({ list: basketCards, prise: boxWithBuyModel.costSelectedProducts()}); // Товары в корзине
 });
 
@@ -200,52 +154,37 @@ events.on('card:click_delete', (data:{item:IProduct}) => {
     boxWithBuyModel.deleteProduct(data.item);
 });
 
-events.on('basket:clean', () => {  // Модель данных событие -> Презентер слушатель -> Представление отрисовка
+// Очистка Корзины. Модель данных событие -> Презентер слушатель -> Представление отрисовка
+events.on('basket:clean', () => {  
     basketView.buttonState = true;
-    modalCardPreview.textCardButton = 'Купить';
     basketView.render({ list: [], prise: boxWithBuyModel.costSelectedProducts()})  
     headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
-
-    // let itemCount = 0;
-    // const basketCards = boxWithBuyModel.selectedProducts.map((item) => {
-    //     itemCount += 1;
-    //     const cardBasketHTML = cloneTemplate<HTMLElement>('#card-basket');
-    //     const cardBasket = new CardBasket(events, cardBasketHTML, {
-    //         onClick: () => {
-    //             boxWithBuyModel.deleteProduct(item);
-    //             if (boxWithBuyModel.numberSelectedProducts() < 1){
-    //                 basketView.buttonState = true;
-    //             };
-    //         },
-    //     });
-        
-    //     return cardBasket.render({title: item.title, price: item.price, basketCardIndex: itemCount});
-
-    // });
-
-    // basketView.render({ list: basketCards, prise: boxWithBuyModel.costSelectedProducts()}); // Товары в корзине
 });
 
 // Работа Презентера с первой формой заказа
-events.on('basket:order', () => {       // Нажата кнопка в корзине Basket basket:order
+events.on('basket:order', () => {       // Нажата кнопка в корзине Basket
     formOrderView.render({payment: buyerModel.payment, address: buyerModel.address});
     modalView.content = formOrderView.render(); 
     modalView.show();
 }); 
 
-events.on('form_order:card', (data:{payment:TPayment}) => {     // Выбран способ оплаты card на форме FormOrder form_order:card
+// Событие выбран способ оплаты card на форме FormOrder
+events.on('form_order:card', (data:{payment:TPayment}) => {     
     buyerModel.payment = data.payment;
 }); 
 
-events.on('form_order:cash', (data:{payment:TPayment}) => {     // Выбран способ оплаты cash на форме FormOrder form_order:cash
+// Событие выбран способ оплаты cash на форме FormOrder
+events.on('form_order:cash', (data:{payment:TPayment}) => {     
     buyerModel.payment = data.payment;
 }); 
 
-events.on('form_order:address', (data:{address:string}) => {    // Указан адрес доставки на форме FormOrder form_order:address
+// Событие указан адрес доставки на форме FormOrder
+events.on('form_order:address', (data:{address:string}) => {    
     buyerModel.address = data.address;
 }); 
 
-events.on('buyer_order:changed', () => {   // Изменились данные покупателя по заказу
+// Событие изменились данные покупателя по заказу
+events.on('buyer_order:changed', () => {   
     const falsePaymentValid = buyerModel.validPayment();     // Валидация первой формы заказа 
     const falseAddressValid = buyerModel.validAddress();
     if (!falsePaymentValid && !falseAddressValid) {
@@ -265,20 +204,24 @@ events.on('buyer_order:changed', () => {   // Изменились данные 
     formOrderView.render({payment: buyerModel.payment, address: buyerModel.address});
 }); 
 
-events.on('order:submit', () => {    // Нажата кнопка перехода ко второй форме оформления заказа FormOrder
+// Событие нажата кнопка перехода ко второй форме оформления заказа
+events.on('order:submit', () => {    
     formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
     modalView.content = formContactsView.render();
 }); 
 
-events.on('form_contacts:email', (data:{email:string}) => {    // Введён адрес электронной почты на форме FormContacts form_contacts:email
+// Событие введён адрес электронной почты на форме FormContacts
+events.on('form_contacts:email', (data:{email:string}) => {    
     buyerModel.email = data.email;
 }); 
 
-events.on('form_contacts:phone', (data:{phone:string}) => {    // Введён телефонный номер покупателя на форме FormContacts form_contacts:phone
+// Событие введён телефонный номер покупателя на форме FormContacts
+events.on('form_contacts:phone', (data:{phone:string}) => {    
     buyerModel.phone = data.phone;
 }); 
 
-events.on('buyer_contacts:changed', () => {      // Изменились контактные данные покупателя
+// Событие изменились контактные данные покупателя
+events.on('buyer_contacts:changed', () => {      
     const falseEmailValid = buyerModel.validEmail();     // Валидация второй формы заказа 
     const falsePhoneValid = buyerModel.validPhone();
     if (!falseEmailValid && !falsePhoneValid) {
@@ -297,9 +240,8 @@ events.on('buyer_contacts:changed', () => {      // Изменились кон�
     formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
 }); 
 
-events.on('contacts:submit', () => {    // Нажата кнопка завершения оформления заказа во второй форме FormContacts
-    //const sendOderRequest = new CommunicationLayer(urlApi);
-    //const request = sendOderRequest.postBuy({
+// Событие нажата кнопка завершения оформления заказа во второй форме FormContacts
+events.on('contacts:submit', () => {    
     async function handlePostBuyResponse() {
         try {
             const request = await dataCommunicationLayer.postBuy({
@@ -311,7 +253,6 @@ events.on('contacts:submit', () => {    // Нажата кнопка завер�
                 phone: buyerModel.phone
             });
 
-            //console.log('Ответ от сервера:', request);
             return request;
         } catch (error) {
             console.error('Ошибка при отправке запроса:', error); // Обработка ошибок, которые могут возникнуть при отправке запроса
@@ -319,7 +260,6 @@ events.on('contacts:submit', () => {    // Нажата кнопка завер�
     };
 
     handlePostBuyResponse().then((request) => {
-        //console.log('Ответ then:', request?.total);
         if (request?.id) {
             buyerModel.clearDataBuyer();
             boxWithBuyModel.cleanSelectedProducts();
@@ -327,16 +267,9 @@ events.on('contacts:submit', () => {    // Нажата кнопка завер�
             modalView.content = orderSuccessView.render();
         };
     });
-
-    //orderSuccessView.render({description: request.total});
-
-    // if (sendOderRequest) {
-    //     orderSuccessView.render({description: boxWithBuyModel.costSelectedProducts()});
-    //     modalView.content = orderSuccessView.render();
-    // };
 });
 
+// Событие нажата кнопка закрытия в модальном окне успешного заказа
 events.on('order_success:close', () => {
-    //headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
     modalView.close();
 });

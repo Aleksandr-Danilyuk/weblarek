@@ -15,7 +15,6 @@ export class CardPreview extends Card<ICardPreview>  {
     protected categoryElement: HTMLElement;
     protected cardButton: HTMLButtonElement;
 
-    //constructor(protected events:IEvents, container: HTMLElement, actions?: ICardPreviewActions) {
     constructor(protected events:IEvents, container: HTMLElement) {
         super(container);
 
@@ -25,28 +24,8 @@ export class CardPreview extends Card<ICardPreview>  {
         this.cardButton = ensureElement<HTMLButtonElement>('.card__button', this.container);
 
         this.cardButton.addEventListener('click', () => 
-            this.events.emit('card:add')     // На кнопку привязываем событие добавление товара в корзину
+            this.events.emit('card:add')     // Нажатие на кнопку добавления товара в корзину
         );
-
-        // this.description = item.description;
-        // this.category = item.category;
-        // this.image = item.image;
-        // this.price = item.price;
-        // this.title = item.title;
-
-        // if (actions?.onClick) {
-        //     this.cardButton.addEventListener('click', actions.onClick)
-        // };
-
-        
-        // if (super.price === null) {
-        //     this.buttonState = true;
-        // } else {
-        //     this.buttonState = false;
-        // };
-
-        // this.textCardButton = 'Купить';      // Отрисовываем кнопку Купить
-
     };
 
     set description(value: string) {
@@ -64,15 +43,6 @@ export class CardPreview extends Card<ICardPreview>  {
     set image(value: string) {
         this.setImage(this.imageElement, value, this.title);
     };
-
-    // disabledButton(){
-    //     this.cardButton.disabled = true;
-    // };
-
-    // enabledButton(){
-    //     this.cardButton.disabled = false;
-    // };
-
 
     set buttonState(value: boolean) {
         this.cardButton.disabled = value;

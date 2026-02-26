@@ -10,7 +10,6 @@ export class BoxWithBuy {
     constructor(protected events:IEvents) {
         this._selectedProducts = new Array<IProduct>();
         this.events.emit('basket:clean');
-        //this.events.emit('basket:changed');
     }
 
     // Методы класса:   
@@ -33,11 +32,8 @@ export class BoxWithBuy {
 
     // очистка корзины
     cleanSelectedProducts() {
-        //this._selectedProducts = this._selectedProducts.splice(0);
-        //.selectedProducts.map((items) => {this.deleteProduct(items)});
         this._selectedProducts = new Array<IProduct>();
         this.events.emit('basket:clean');
-        //this.events.emit('basket:changed');
     }
 
     // получение стоимости всех товаров в корзине

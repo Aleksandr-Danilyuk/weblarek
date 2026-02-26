@@ -21,7 +21,7 @@ export class Basket extends Component<IBasket>  {
         this.basketButton = ensureElement<HTMLButtonElement>('.basket__button', this.container);
 
         this.basketButton.addEventListener('click', () => {
-            this.events.emit('basket:order');
+            this.events.emit('basket:order');  // Слой отображения: нажатие кнопки оформления заказа в Корзине
         });
 
         this.basketButton.disabled = true;
@@ -29,20 +29,11 @@ export class Basket extends Component<IBasket>  {
 
     set list(value: HTMLElement[]) {
         this.basketList.replaceChildren(...value);
-        //this.events.emit('basket:change');
     };
 
     set prise(value: number) {
         this.basketPrise.textContent = `${value} синапсов`;
     };
-
-    // disabledButton(){
-    //     this.basketButton.disabled = true;
-    // };
-
-    // enabledButton(){
-    //     this.basketButton.disabled = false;
-    // };
 
     set buttonState(value: boolean) {
         this.basketButton.disabled = value;

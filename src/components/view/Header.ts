@@ -4,7 +4,7 @@ import {ensureElement} from '../../utils/utils';
 
 interface IHeader {  
   counter: number; 
-}  
+};  
 
 export class Header extends Component<IHeader> {
     protected counterElement: HTMLElement;
@@ -16,9 +16,8 @@ export class Header extends Component<IHeader> {
         this.counterElement = ensureElement<HTMLElement>('.header__basket-counter', this.container);
         this.basketButton = ensureElement<HTMLButtonElement>('.header__basket', this.container);
 
-
         this.basketButton.addEventListener('click', () => {
-            this.events.emit('basket:click');
+            this.events.emit('basket:click');   // Слой отображения: событие нажатие копки корзины
         });
     };
 
