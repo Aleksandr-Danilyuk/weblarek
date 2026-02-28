@@ -260,6 +260,8 @@ events.on('contacts:submit', () => {
                 boxWithBuyModel.cleanSelectedProducts();
                 orderSuccessView.render({description: request.total});
                 modalView.content = orderSuccessView.render();
+            } else {
+                console.log('В ответе сервера не найдены данные по обрабтанному заказу'); // Обработка ошибок, которые могут возникнуть при отправке запроса
             };
         });
     } catch (error) {
