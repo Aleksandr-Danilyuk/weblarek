@@ -21,9 +21,11 @@ export class Modal extends Component<IModal> {
         });
 
         // Закрываем модальное окно если клик был сделан вне модального окна и его дочерних элементов
-        document.addEventListener('click', (event) => {
+        // document.addEventListener('click', (event) => {
+        this.container.addEventListener('click', (event) => {
             if (event.target === this.container) {
-                this.container.classList.remove('modal_active'); 
+                // this.container.classList.remove('modal_active'); 
+                this.close(); 
             };
         });
     };
