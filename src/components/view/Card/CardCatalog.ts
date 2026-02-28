@@ -2,24 +2,25 @@ import {Card} from './Card';
 import {ensureElement} from '../../../utils/utils';
 import {IProduct} from '../../../types';
 import {categoryMap} from '../../../utils/constants';
-import {IEvents} from '../../base/Events';
 
 type CategoryKey = keyof typeof categoryMap;
 type ICardCatalog = Pick<IProduct, 'image' |  'category'>; 
+
+type ICardActions = { onClick: (event: PointerEvent) => void }; 
 
 export class CardCatalog extends Card<ICardCatalog>  {
     protected categoryElement: HTMLElement;
     protected imageElement: HTMLImageElement;
 
-    constructor(protected events:IEvents, container: HTMLElement, item: IProduct) {
+    constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
 
         this.categoryElement = ensureElement<HTMLElement>('.card__category', this.container);
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', this.container);
 
-        this.container.addEventListener('click', () => 
-            this.events.emit('card:click', {item})
-        );
+        if (actions?.onClick) { 
+            this.container.addEventListener('click', actions.onClick); 
+        }; 
     };
 
     set category(value: string) {

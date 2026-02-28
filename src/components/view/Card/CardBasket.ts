@@ -1,7 +1,7 @@
 import {Card} from './Card';
 import {ensureElement} from '../../../utils/utils';
-import {IEvents} from '../../base/Events';
-import {IProduct} from '../../../types';
+
+type ICardActions = { onClick: (event: PointerEvent) => void }; 
 
 interface ICardBasket {  
   basketCardIndex: number; 
@@ -11,15 +11,15 @@ export class CardBasket extends Card<ICardBasket>  {
     protected indexCardElement: HTMLElement;
     protected buttonDeleteCard: HTMLButtonElement;
 
-    constructor(protected events:IEvents, container: HTMLElement, item: IProduct) {
+    constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
 
         this.indexCardElement = ensureElement<HTMLElement>('.basket__item-index', this.container);
         this.buttonDeleteCard = ensureElement<HTMLButtonElement>('.basket__item-delete', this.container);
 
-        this.buttonDeleteCard.addEventListener('click', () => 
-            this.events.emit('card:click_delete', {item})   // Представление -> Презентеру, клик на удаление товара из корзины    
-        );
+        if (actions?.onClick) { 
+            this.buttonDeleteCard.addEventListener('click', actions.onClick); 
+        }; 
     };
 
     set basketCardIndex(value: number) {

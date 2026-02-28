@@ -76,7 +76,11 @@ dataCommunicationLayer.getProduct().then(products => {
 events.on('catalog:changed', () => {
     const itemCards = productsModel.allProduct.map((item) => {
         const CardCatalogTemplate = cloneTemplate<HTMLElement>('#card-catalog');
-        const card = new CardCatalog(events, CardCatalogTemplate, item);
+        const card = new CardCatalog(CardCatalogTemplate, {  
+            onClick: () => {
+                events.emit('card:click', {item}); 
+            }
+        });
         return card.render(item);
     });
 
@@ -106,7 +110,7 @@ events.on('card:select', () => {
     // Проверяем в модели данных Корзины товар, отрисовываем текст кнопки
     if (boxWithBuyModel.checkProduct(productsModel.selectedProduct.id)) { 
         modalCardPreview.textCardButton = 'Удалить из корзины';
-    } else if (boxWithBuyModel.checkProduct(productsModel.selectedProduct.id) && productsModel.selectedProduct.price !== null) {
+    } else if (productsModel.selectedProduct.price !== null) {
         modalCardPreview.textCardButton = 'Купить';
     } else {
         modalCardPreview.textCardButton = 'Недоступно'; // Исправлено отображение кнопок без цены
@@ -117,11 +121,12 @@ events.on('card:select', () => {
 
 // Событие добавления карточки в корзину
 events.on('card:add', () => {    
-       if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
-                boxWithBuyModel.addProduct(productsModel.selectedProduct);  // Presenter добавляет/удаляет карточку в Корзину
-        } else if (productsModel.selectedProduct) {
-                boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
-        };
+    if (productsModel.selectedProduct && !boxWithBuyModel.checkProduct(productsModel.selectedProduct?.id)) {
+            boxWithBuyModel.addProduct(productsModel.selectedProduct);  // Presenter добавляет/удаляет карточку в Корзину
+    } else if (productsModel.selectedProduct) {
+            boxWithBuyModel.deleteProduct(productsModel.selectedProduct);
+    };
+    modalView.close();
 });  
 
 // Событие открытия корзины headerView слоя View 
@@ -131,13 +136,8 @@ events.on('basket:click', () => {    // Событие нажатия на кн�
 });  
 
 // Событие данные корзины изменены
-events.on('basket:changed', (data: {product: IProduct})  => {  
-    if (boxWithBuyModel.checkProduct(data.product.id)) {    // Изменение названий кнопок: проверка товара в карзине
-            modalCardPreview.textCardButton = 'Удалить из корзины';
-    } else if (!boxWithBuyModel.checkProduct(data.product.id)) {
-            modalCardPreview.textCardButton = 'Купить';
-    };
-    
+events.on('basket:changed', ()  => {  
+
     const numberSelectedProducts = boxWithBuyModel.numberSelectedProducts();
     headerView.render({counter: numberSelectedProducts}); // Отрисовывка числа в шапке в корзине
     if (numberSelectedProducts < 1) {
@@ -148,7 +148,11 @@ events.on('basket:changed', (data: {product: IProduct})  => {
     
     const basketCards = boxWithBuyModel.selectedProducts.map((item, index) => {
         const cardBasketHTML = cloneTemplate<HTMLElement>('#card-basket');
-        const cardBasket = new CardBasket(events, cardBasketHTML, item);
+        const cardBasket = new CardBasket(cardBasketHTML, {
+            onClick: () => {
+                events.emit('card:click_delete', {item}); 
+            }
+        });
         return cardBasket.render({title: item.title, price: item.price, basketCardIndex: index + 1});
     });
     
@@ -161,12 +165,6 @@ events.on('card:click_delete', (data:{item:IProduct}) => {
     boxWithBuyModel.deleteProduct(data.item);
 });
 
-// Очистка Корзины. Модель данных событие -> Презентер слушатель -> Представление отрисовка
-events.on('basket:clean', () => {  
-    basketView.buttonState = true;
-    basketView.render({ list: [], prise: boxWithBuyModel.costSelectedProducts()})  
-    headerView.render({counter:boxWithBuyModel.numberSelectedProducts()});
-});
 
 // Работа Презентера с первой формой заказа
 events.on('basket:order', () => {       // Нажата кнопка в корзине Basket
@@ -191,9 +189,12 @@ events.on('form_order:address', (data:{address:string}) => {
 }); 
 
 // Событие изменились данные покупателя по заказу
-events.on('buyer_order:changed', () => {   
-    const falsePaymentValid = buyerModel.validPayment();     // Валидация первой формы заказа 
+events.on('buyer:changed', () => {   
+    const falsePaymentValid = buyerModel.validPayment();     // Валидация указанных данных заказа 
     const falseAddressValid = buyerModel.validAddress();
+    const falseEmailValid = buyerModel.validEmail();
+    const falsePhoneValid = buyerModel.validPhone();
+
     if (!falsePaymentValid && !falseAddressValid) {
         formOrderView.validationError = '';
         formOrderView.buttonState = false;
@@ -208,8 +209,24 @@ events.on('buyer_order:changed', () => {
         formOrderView.buttonState = true;
     }
 
+    if (!falseEmailValid && !falsePhoneValid) {
+        formContactsView.validationError = '';
+        formContactsView.buttonState = false;
+    } else if (!falseEmailValid) { 
+        formContactsView.validationError = buyerModel.validPhone();
+        formContactsView.buttonState = true; 
+    } else if (!falsePhoneValid) {
+        formContactsView.validationError = buyerModel.validEmail();
+        formContactsView.buttonState = true;
+    } else {
+        formContactsView.validationError = `${buyerModel.validEmail()} , ${buyerModel.validPhone()}`;
+        formContactsView.buttonState = true;
+    };
+
+    formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
     formOrderView.render({payment: buyerModel.payment, address: buyerModel.address});
 }); 
+
 
 // Событие нажата кнопка перехода ко второй форме оформления заказа
 events.on('order:submit', () => {    
@@ -227,55 +244,7 @@ events.on('form_contacts:phone', (data:{phone:string}) => {
     buyerModel.phone = data.phone;
 }); 
 
-// Событие изменились контактные данные покупателя
-events.on('buyer_contacts:changed', () => {      
-    const falseEmailValid = buyerModel.validEmail();     // Валидация второй формы заказа 
-    const falsePhoneValid = buyerModel.validPhone();
-    if (!falseEmailValid && !falsePhoneValid) {
-        formContactsView.validationError = '';
-        formContactsView.buttonState = false;
-    } else if (!falseEmailValid) { 
-        formContactsView.validationError = buyerModel.validPhone();
-        formContactsView.buttonState = true; 
-    } else if (!falsePhoneValid) {
-        formContactsView.validationError = buyerModel.validEmail();
-        formContactsView.buttonState = true;
-    } else {
-        formContactsView.validationError = `${buyerModel.validEmail()} , ${buyerModel.validPhone()}`;
-        formContactsView.buttonState = true;
-    };
-    formContactsView.render({email: buyerModel.email, phone: buyerModel.phone});
-}); 
-
 // Событие нажата кнопка завершения оформления заказа во второй форме FormContacts
-// events.on('contacts:submit', () => {    
-//     async function handlePostBuyResponse() {
-//         try {
-//             const request = await dataCommunicationLayer.postBuy({
-//                 items: boxWithBuyModel.selectedProducts.map((item) => item.id),
-//                 total: boxWithBuyModel.costSelectedProducts(),
-//                 payment: buyerModel.payment,
-//                 address: buyerModel.address,
-//                 email: buyerModel.email,
-//                 phone: buyerModel.phone
-//             });
-
-//             return request;
-//         } catch (error) {
-//             console.error('Ошибка при отправке запроса:', error); // Обработка ошибок, которые могут возникнуть при отправке запроса
-//         };
-//     };
-
-//     handlePostBuyResponse().then((request) => {
-//         if (request?.id) {
-//             buyerModel.clearDataBuyer();
-//             boxWithBuyModel.cleanSelectedProducts();
-//             orderSuccessView.render({description: request.total});
-//             modalView.content = orderSuccessView.render();
-//         };
-//     });
-// });
-
 events.on('contacts:submit', () => {    
     try {
         dataCommunicationLayer.postBuy({
@@ -286,8 +255,6 @@ events.on('contacts:submit', () => {
             email: buyerModel.email,
             phone: buyerModel.phone
         }).then((request) => {
-            console.log('Запрос: ');
-            console.log(request);
             if (request?.id) {
                 buyerModel.clearDataBuyer();
                 boxWithBuyModel.cleanSelectedProducts();
